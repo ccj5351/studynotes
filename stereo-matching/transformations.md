@@ -9,8 +9,8 @@
 
 - homogenerous tranform
 
-<img src="../files/intro-robotics-01.png" alt="drawing" width="700"/>
+<img src="../files/intro-robotics-02.png" alt="drawing" width="700"/>
 
 - homogenerous tranform matric representation
 
-<img src="../files/intro-robotics-01.png" alt="drawing" width="700"/>
+<img src="../files/intro-robotics-03.png" alt="drawing" width="700"/>
