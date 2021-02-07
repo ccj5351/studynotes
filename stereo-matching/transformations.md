@@ -5,11 +5,12 @@
 ## Spatial descriptions and transformations
 
 - Notation
+
 <img src="../files/intro-robotics-01.png" alt="drawing" width="700"/>
 
 - homogenerous tranform
 
-<img src="../files/intro-robotics-02.png" alt="drawing" width="700"/>
+<img src="../files/intro-robotics-02.png" alt="drawing" width="800"/>
 
 - homogenerous tranform matric representation
 
