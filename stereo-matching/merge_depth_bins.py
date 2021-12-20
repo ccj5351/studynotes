@@ -22,21 +22,26 @@ def merge_hist_bins(hist, bin_edges, \
     print ("[***] hist_thred = ", hist_thred)
     assert len(hist) == len(bin_edges) - 1
     bin_dict = {}
-    i_rightmost = 0
+    i_rightmost = 0 # right most bin edge of current i;
     for i in range(0, len(hist)):
         if i < i_rightmost:
             continue
-        edge_left = bin_edges[i]
+        edge_left = bin_edges[i] # bin left edge;
         j = i
-        tmp_hist_sum = 0
+        tmp_hist_sum = 0 # sum of several bins we have considered
         while tmp_hist_sum < hist_thred and j < len(hist):
             tmp_hist_sum += hist[j]
             j += 1
-            edge_right = bin_edges[j]
-        else:
+            edge_right = bin_edges[j] # find next bin if not yet enough elements found;
+        else: # save new bin, with its left and right edges as key, and the element number as value;
             bin_dict[(edge_left, edge_right)] = tmp_hist_sum
-        i_rightmost = j
+        
+        # save right-most right-edge, so that we can 
+        # skip many incomimg indices from next loops;
+        i_rightmost = j 
     
+    #---------------------------------    
+    # print info of the new histogram;
     idx = 0
     new_hist = []
     new_bin_edges = [bin_edges[0]]
@@ -47,14 +52,17 @@ def merge_hist_bins(hist, bin_edges, \
         idx += 1
     print ("[***] done, hist_thred = ", hist_thred)
     print ("[***] old bin # = {}, new bin # = {}".format(len(bin_edges), len(new_bin_edges)))
+    # return new hist, bins, and thred we used;
     return np.array(new_hist), np.array(new_bin_edges), hist_thred
 
-        
+# plotting the histogram        
 def show_hist(bin_edges, hist, fig_file = None):
     d_min = bin_edges[0]
     d_max = bin_edges[-1]
     d_num = len(bin_edges)
-    fig, ax = plt.subplots()  #create figure and axes 
+    fig, ax = plt.subplots()  #create figure and axes
+    
+    ## this is the right way we how to draw histogram
     plt.hist(x=bin_edges[:-1], bins=bin_edges, weights=hist) 
     plt.xlabel('Value')
     plt.ylabel('Frequency')
