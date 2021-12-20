@@ -92,3 +92,7 @@ the bin merging. In this example, input hist bin # = 256, new hist bin # = 95, w
 
   [1]: https://i.stack.imgur.com/jLwV8.png
   [2]: https://i.stack.imgur.com/yyJz1.png
+
+## Complete Code
+
+- See the complete code [here](https://github.com/ccj5351/studynotes/edit/master/stereo-matching/merge_depth_bins.py)
