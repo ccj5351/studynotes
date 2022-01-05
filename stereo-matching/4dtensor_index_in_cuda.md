@@ -59,7 +59,7 @@ __global__ void sampler_forward_kernel(
 
 ```
 
-- The host function to call the kernel is defined below, and pay attention to syntex "<<<blocks, threads>>>" and how the `blocks` and `threds` dimensions are difined by `dim3`:
+- The host function to call the kernel is defined below, and pay attention to syntex "<<<blocks, threads>>>" and how the `blocks` and `threads` dimensions are difined by `dim3`:
 
 ```cpp
 std::vector<torch::Tensor> sampler_cuda_forward(
@@ -100,7 +100,7 @@ std::vector<torch::Tensor> sampler_cuda_forward(
 
 ## [Another Higher-level Example](https://github.com/lizhihao6/Forward-Warp)
 
-- In this example, we can see another way to define grids, blocks and threds using 1D indexing (i.e., only with gridDim, blockDim.x, and threadIdx.x).
+- In this example, we can see another way to define grids, blocks and threds using 1D indexing (i.e., only with `*.x` as in `gridDim.x`, `blockDim.x`, and `threadIdx.x`).
 
 > const int B = im0.size(0);
   const int C = im0.size(1);
