@@ -5,9 +5,8 @@
 
 OpenGL Pipeline has a series of processing stages in order. Two graphical information, vertex-based data and pixel-based data, are processed through the pipeline, combined together then written into the frame buffer. Notice that OpenGL can send the processed data back to your application.  _(See the grey color lines)_
 
-![OpenGL Pipeline](https://www.songho.ca/opengl/files/gl_pipeline.gif)  
+![OpenGL Pipeline](./data/gl_pipeline.gif)
 
-OpenGL Pipeline
 
 ## Display List
 
