@@ -14,11 +14,11 @@ Display list is a group of OpenGL commands that have been stored (compiled) for 
 
 ## Vertex Operation
 
-Each vertex and normal coordinates are transformed by GL_MODELVIEW matrix (from object coordinates to eye coordinates). Also, if lighting is enabled, the lighting calculation per vertex is performed using the transformed vertex and normal data. This lighting calculation updates new color of the vertex.  _(See more details in  [Transformation](https://www.songho.ca/opengl/gl_transform.html))_  
+Each vertex and normal coordinates are transformed by `GL_MODELVIEW` matrix (from object coordinates to eye coordinates). Also, if lighting is enabled, the lighting calculation per vertex is performed using the transformed vertex and normal data. This lighting calculation updates new color of the vertex.  _(See more details in  [Transformation](https://www.songho.ca/opengl/gl_transform.html))_  
 
 ## Primitive Assembly
 
-After vertex operation, the primitives (point, line, and polygon) are transformed once again by projection matrix then clipped by viewing volume clipping planes; from eye coordinates to clip coordinates. After that, perspective division by w occurs and viewport transform is applied in order to map 3D scene to window space coordinates. Last thing to do in Primitive Assembly is culling test if culling is enabled.  
+After vertex operation, the primitives (`point`, `line`, and `polygon`) are transformed once again by projection matrix then clipped by viewing volume clipping planes; from eye coordinates to clip coordinates. After that, perspective division by w occurs and viewport transform is applied in order to map 3D scene to window space coordinates. Last thing to do in Primitive Assembly is culling test if culling is enabled.  
 
 ## Pixel Transfer Operation
 
