@@ -219,10 +219,12 @@ Both functions require 6 parameters to specify 6 clipping planes;  _left_,  _rig
 
 The vertices of the far (back) plane can be simply calculated by the ratio of similar triangles, for example, the left of the far plane is:
 
+$$
+\frac{\text{far}}{\text{near}} = \frac{\text{left}_\text{far}}{\text{left}} \Rightarrow
 
-<center>
-<img src="./data/gl_transform10.png" alt="Alt text" width="400"/>
-</center>
+\text{left}_\text{far} = \frac{\text{far}}{\text{near}} \cdot {\text{left}}
+$$
+
 
 For orthographic projection, this ratio will be 1, so the  _left_,  _right_,  _bottom_  and  _top_  values of the far plane will be the same as on the near plane.
 
