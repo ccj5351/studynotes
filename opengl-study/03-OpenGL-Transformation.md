@@ -225,7 +225,10 @@ The vertices of the far (back) plane can be simply calculated by the ratio of si
 </center>
 
 For orthographic projection, this ratio will be 1, so the  _left_,  _right_,  _bottom_  and  _top_  values of the far plane will be the same as on the near plane.
-![OpenGL Orthographic Frustum | center | 700x0](./data/gl_transform11.png)
+
+<center>
+<img src="./data/gl_transform11.png" alt="OpenGL Orthographic Frustum " width="700"/>
+</center>
 
 You may also use `gluPerspective()` and `gluOrtho2D()` functions with less number of parameters.  **gluPerspective()**  requires only 4 parameters; vertical field of view (FOV), the aspect ratio of width to height and the distances to near and far clipping planes. The equivalent conversion from `gluPerspective()` to `glFrustum()` is described in the following code.
 
@@ -247,7 +250,7 @@ void makeFrustum(double fovY, double aspectRatio, double front, double back)
 ```
 
 <center>
-<img src="./data/gl_transform015.png" alt="An example of an asymmetric frustum" width="700"/>
+<img src="./data/gl_transform15.png" alt="An example of an asymmetric frustum" width="700"/>
 </center>
 
 
