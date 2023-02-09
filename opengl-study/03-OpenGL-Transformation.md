@@ -169,7 +169,7 @@ GL_MODELVIEW matrix combines the viewing matrix and modeling matrix into one mat
 </center>
 
 
-The 3 matrix elements of the rightmost column (_$m_{12}$_,  _$m_{13}$_,  _$m_{14}$_) are for the translation transformation,  **glTranslatef()**. The element  _$m_{15}$_  is the  [homogeneous coordinate](https://www.songho.ca/math/homogeneous/homogeneous.html). It is specially used for projective transformation.
+The 3 matrix elements of the rightmost column ($m_{12}$,  $m_{13}$,  $m_{14}$) are for the translation transformation,  **glTranslatef()**. The element  $m_{15}$  is the  [homogeneous coordinate](https://www.songho.ca/math/homogeneous/homogeneous.html). It is specially used for projective transformation.
 
 3 elements sets, ($m_{0}$,  $m_{1}$,  $m_{2}$), ($m_{4}$,  $m_{5}$,  $m_{6}$) and ($m_{8}$,  $m_{9}$,  $m_{10}$) are for Euclidean and affine transformation, such as rotation  **glRotatef()**  or scaling  **glScalef()**. Note that these 3 sets are actually representing 3 orthogonal axes;
 
