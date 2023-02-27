@@ -154,9 +154,10 @@ if __name__ == "__main__":
         print (f"Saved results to {tmp_path}")
 
         if 1:
-            fig, axes = plt.subplots(1, 2, figsize=(15, 10))
-            axes[0].imshow(dxy_clr[0].permute(1,2,0).cpu().numpy())
-            axes[1].imshow(disp_clr[0].permute(1,2,0).cpu().numpy())
+            #fig, axes = plt.subplots(1, 2, figsize=(15, 10))
+            fig, axes = plt.subplots(1, 2)
+            axes[0].imshow(disp_clr[0].permute(1,2,0).cpu().numpy())
+            axes[1].imshow(dxy_clr[0].permute(1,2,0).cpu().numpy())
             axes[0].title.set_text("Input GT Disparity (color)")
             axes[1].title.set_text("Calculated dxy (color)")
             plt.suptitle("Slanted Disparity Plane Fitting")
