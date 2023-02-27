@@ -1,3 +1,5 @@
 .ipynb_checkpoints/
 .DS_Store
 *.ply
+__pycache__/
+3d-geometry/build/
