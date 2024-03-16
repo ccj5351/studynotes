@@ -98,4 +98,4 @@ $T^{w}_{c}$ = $T^{w}_{wned}$ * $T^{wned}_{cned}$ * $T^{cned}_{c}$
 
 $T^{w}_{c}$ = $T^{w}_{wned}$ * $T^{wned}_{cned}$ * $T^{cned}_{c}$ = $T$ * `camera-to-world-pose-NED` * inv(T)
 
-where, we assume the `camera-to-wolrd pose in NED` is provided by the dataset (e.g., [TarTanAir dataset](https://github.com/castacks/tartanair_tools/blob/b2f023bbca5606c05d4189811c3eee6f99564037/data_type.md)).
+where, we assume the `camera-to-wolrd pose in NED` is provided by the dataset (e.g., [TarTanAir dataset](https://github.com/castacks/tartanair_tools/blob/b2f023bbca5606c05d4189811c3eee6f99564037/data_type.md)). Please see my [answer to this issue](https://github.com/castacks/tartanair_tools/issues/37) in the TartanAir Dataset repo.
