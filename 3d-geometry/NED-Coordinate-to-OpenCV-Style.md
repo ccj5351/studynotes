@@ -1,8 +1,8 @@
-# How to calculate transformation matrix between NED and OpenCV coornidate systems
+# How to calculate the transformation matrix between NED and OpenCV coordinate systems
 
 ## NED (North-East-Down) Coordinate System
 
-- A north-east-down (NED) system uses the Cartesian coordinates (xNorth,yEast,zDown) to represent position relative to a local origin. 
+- A north-east-down (NED) system uses the Cartesian coordinates (North, yEast, zDown) to represent position relative to a local origin. 
 
 - In NED, we have the x-axis points forward, the y-axis to the right, and the z-axis downward.
 
@@ -52,7 +52,7 @@ Assume we have the following coordinate systems:
 It is because we use the following pipeline to connect RGB, camera, and world:
 
 
-RGB image $(x,y)$ with $x$ to right, $y$ down, and image `origin` in the `left-top corner`
+RGB image $(x,y)$ with $x$ pointing to the right, $y$ down, and image `origin` in the `left-top corner`
 ---> camera intrinsic K and inverse invK ---> camera points $P^{c}$ = $(X^{c}, Y^{c},Z^{c})$
 ---> camera extrinsic E and inverse invE ---> world points $P^{w}$ = $(X^{w}, Y^{w},Z^{w})$.
 
@@ -98,4 +98,4 @@ $T^{w}_{c}$ = $T^{w}_{wned}$ * $T^{wned}_{cned}$ * $T^{cned}_{c}$
 
 $T^{w}_{c}$ = $T^{w}_{wned}$ * $T^{wned}_{cned}$ * $T^{cned}_{c}$ = $T$ * `camera-to-world-pose-NED` * inv(T)
 
-where, we assume the `camera-to-wolrd pose in NED` is provided by the dataset (e.g., [TarTanAir dataset](https://github.com/castacks/tartanair_tools/blob/b2f023bbca5606c05d4189811c3eee6f99564037/data_type.md)). Please see my [answer to this issue](https://github.com/castacks/tartanair_tools/issues/37) in the TartanAir Dataset repo.
+where, we assume the `camera-to-wolrd pose in NED` is provided by the dataset (e.g., [TartanAir dataset](https://github.com/castacks/tartanair_tools/blob/b2f023bbca5606c05d4189811c3eee6f99564037/data_type.md)). Please see my [answer to this issue](https://github.com/castacks/tartanair_tools/issues/37) in the TartanAir Dataset repo.
