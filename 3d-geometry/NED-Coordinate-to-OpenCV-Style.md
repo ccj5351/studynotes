@@ -2,15 +2,15 @@
 
 ## NED (North-East-Down) Coordinate System
 
-- A north-east-down (NED) system uses the Cartesian coordinates (North, yEast, zDown) to represent position relative to a local origin. 
+- A north-east-down (NED) system uses the Cartesian coordinates (xNorth, yEast, zDown) to represent position relative to a local origin. 
 
 - In NED, we have the x-axis points forward, the y-axis to the right, and the z-axis downward.
 
 ```plain
-               / +x (to forward, North)
+                  / +x (to forward, North)
+                /
               /
-             /
- (Origin O) /- - - - - --  +y (to right, East)
+ (Origin O) /_ _ _ _ _ _ _ _ +y (to right, East)
             |
             |
             |
@@ -25,10 +25,10 @@
 - OpenCV coordinate system uses the Cartesian coordinates as the x-axis pointing to the right, the y-axis downward, and the z-axis forward.
 
 ```plain
-               / +z (to Forward)
+                  / +z (to Forward)
+                /
               /
-             /
- (Origin O) /- - - - - --  +x (to Right)
+ (Origin O) /_ _ _ _ _ _ _   +x (to Right)
             |
             |
             |
