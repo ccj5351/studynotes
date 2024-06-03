@@ -93,7 +93,27 @@ The following examples show different kinds of transformation but all relate to 
 
 - Rotations and translations: rigid motions. A rigid motion couples pure translation with pure rotation:
 
-- 
+<p align="center">
+  <img src="./data/homo-trans.png" width="700">
+</p>
+
+- We can get the homogeneous transformation as
+  $${ }^A P={ }_B^A R \,\, { }^BP + { }^A P_{BORG} $$
+
+Or in the matrix expression as 
+
+$$
+\left(\begin{array}{l}
+{ }^A P \\
+1 
+\end{array}\right)=\left(\begin{array}{l}
+ { }_B^AR & { }^A P_{BORG} \\
+0 & 1 
+\end{array}\right) \left(\begin{array}{l}
+{ }^B P \\
+1 
+\end{array}\right)
+$$
 
 
 ## Homography between Two Cameras
@@ -101,9 +121,9 @@ The following examples show different kinds of transformation but all relate to 
 > see Wiki: https://en.wikipedia.org/wiki/Homography_(computer_vision)
 
 
-In the field of computer vision, any two images of the same planar surface in space are related by a `homography` (assuming a pinhole camera model). This has many practical applications, such as `image rectification`, `image registration`, or `camera motion— rotation and translation` between two images. Once camera resectioning has been done from an estimated homography matrix, this information may be used for navigation, or to insert models of 3D objects into an image or video, so that they are rendered with the correct perspective and appear to have been part of the original scene (see Augmented reality).
+- In the field of computer vision, any two images of the same planar surface in space are related by a `homography` (assuming a pinhole camera model). This has many practical applications, such as `image rectification`, `image registration`, or `camera motion— rotation and translation` between two images. Once camera resectioning has been done from an estimated homography matrix, this information may be used for navigation, or to insert models of 3D objects into an image or video, so that they are rendered with the correct perspective and appear to have been part of the original scene (see Augmented reality).
 
-
+- Given the Homogeneous Transformations above:
 
 
 All feature maps are warped into different frontoparallel planes of the reference camera to form $N$ feature volumes $\{\mathbf{V}_i\}^N_{i=1}$. 
