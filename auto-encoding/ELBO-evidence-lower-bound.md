@@ -36,14 +36,14 @@ Similar to  [the law of total probability](https://en.wikipedia.org/wiki/Law_of_
 <img src="images/ELBO/fig2.svg" alt="p(z) is a simple Gaussian distribution." width="500" />
 </p>
 
-Now we will try to use  `p(z)`  with some transformation  `f(⋅)`  to fit  `p(x)`. Concretely, we select several shifted copies of  `p(z)`  and multiply each of them with a weight  $w_i$. The result is shown in the  [figure](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig3)  below.
+Now we will try to use  `p(z)`  with some transformation  `f(⋅)`  to fit  `p(x)`. Concretely, we select several shifted copies of  `p(z)`  and multiply each of them with a weight  $w_i$. The result is shown in the figure below.
 
 <p align="center">
 <img src="images/ELBO/fig3.svg" alt="A demo to fit p(x) with p(z) and some transformation." width="500" />
 </p>
 
 
-I have to say that this is not a bad fitting consider its simplicity. We can improve this fitting by tweaking the weights, which leads to the following  [fitting](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig4).
+I have to say that this is not a bad fitting consider its simplicity. We can improve this fitting by tweaking the weights, which leads to the following fitting.
 
 <p align="center">
 <img src="images/ELBO/fig4.svg" alt="We tweak the weights to improve the fitting." width="500" />
@@ -75,7 +75,7 @@ This idea is the  [statistical inference](https://en.wikipedia.org/wiki/Statisti
 
 $$ q_\phi \left(z \vert x\right) \approx q_i \left(z\right) \quad \forall x_i \in \mathcal{X}$$
 
-such that the increase of the number of parameters is  `amortized`. This is the  <font color='red'>_amortized variational inference_ </font>, which is also referred to as  <font color='red'> _variational inference_ </font> in recent literature. Up to this point, as shown  [below](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig5), we have explicitly built a probabilistic graphical model to represent our problem where the observation  $x$  is conditioned on the latent variable  $z$  and we aim to infer  $z$  after observing  $x$.
+such that the increase of the number of parameters is  `amortized`. This is the  <font color='red'>_amortized variational inference_ </font>, which is also referred to as  <font color='red'> _variational inference_ </font> in recent literature. Up to this point, as shown below, we have explicitly built a probabilistic graphical model to represent our problem where the observation  $x$  is conditioned on the latent variable  $z$  and we aim to infer  $z$  after observing  $x$.
 
 <p align="center">
 <img src="images/ELBO/fig5.svg" alt="A probabilistic graphical model showing relations between x and z" width="200" />
@@ -105,20 +105,20 @@ Now let’s think about the rationale behind  $\mathcal{L}$.
 - First, we focus on the term  $\mathbb{E}_z \left[ \log p_\theta(x,z) \right]$  where  $z \sim q_\phi \left(z \vert x\right)$. Assuming that the neural network with parameters  $\theta$  gives us the joint distribution  $p_\theta \left(x, z\right)$, the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ that maximizes  $\mathcal{L}$ will be a  [Dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function)  which puts all the probability mass at the maximum of  $p_\theta \left(x, z\right)$. 
 	- The interpretation is as follows. The operation of taking expectation is to just take a weighted average. 
 	- In the case where data being averaged are fixed but weights can be varied (with the constraint that all weights sum to one), you just need to put 1 for the largest data point and 0 for others to maximize that average. 
-	- With this intuition, we get the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$  [shown](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig7)  below.
+	- With this intuition, we get the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ shown below.
 
 <p align="center">
 <img src="images/ELBO/fig7.svg" alt="The optimal distribution is a Dirac delta." width="500" />
 </p>
 
-- However, the story becomes different when we consider the second term in  $\mathcal{L}$, i.e., the `entropy` term. This term tells us the `uncertainty` of a distribution. Samples drawn from a distribution with higher entropy will become more uncertain. Sadly, the entropy of the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ we have just found is `negative infinity`. We can show this by constructing a random variable  `x`  drawn from a uniform distribution  $x \sim \mathcal{U} \left(x_0 - \epsilon, x_0 + \epsilon\right)$. Its entropy is  $\mathbb{E}_x \left[\log \frac{1}{p\left(x\right)}\right] = \log\left(2 \epsilon\right)$.  As  $\epsilon$  approaching zero, this distribution degenerates to a Dirac delta with entropy  $\lim_{\epsilon \to 0}\log\left(2\epsilon\right) = -\infty$. The  [figure](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig8)  below shows the entropy varies as a function of  $q_\phi \left(z \vert x\right)$.
+- However, the story becomes different when we consider the second term in  $\mathcal{L}$, i.e., the `entropy` term. This term tells us the `uncertainty` of a distribution. Samples drawn from a distribution with higher entropy will become more uncertain. Sadly, the entropy of the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ we have just found is `negative infinity`. We can show this by constructing a random variable  `x`  drawn from a uniform distribution  $x \sim \mathcal{U} \left(x_0 - \epsilon, x_0 + \epsilon\right)$. Its entropy is  $\mathbb{E}_x \left[\log \frac{1}{p\left(x\right)}\right] = \log\left(2 \epsilon\right)$.  As  $\epsilon$  approaching zero, this distribution degenerates to a Dirac delta with entropy  $\lim_{\epsilon \to 0}\log\left(2\epsilon\right) = -\infty$. The figure below shows the entropy varies as a function of  $q_\phi \left(z \vert x\right)$.
 
 
 <p align="center">
 <img src="images/ELBO/fig8.svg" alt="The entropy varies as a function of different distributions." width="500" />
 </p>
 
-Put all of them together, the maximization of  $\mathcal{L}$  tries to find an optimal distribution $q_\phi^\ast \left(z \vert x\right)$ which not only fits peaks of  $p_\theta \left(x, z\right)$.  but also spreads as wide as possible. A visualization is given in the  [demo](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig9)  below.
+Put all of them together, the maximization of  $\mathcal{L}$  tries to find an optimal distribution $q_\phi^\ast \left(z \vert x\right)$ which not only fits peaks of  $p_\theta \left(x, z\right)$.  but also spreads as wide as possible. A visualization is given in the demo below.
 
 
 <p align="center">
@@ -191,7 +191,7 @@ $$
 
 It suggests that the variational  _posterior_  $q_\phi(z \vert x)$  is prevented from spanning the whole space relative to the true  _posterior_  $p\left(z \vert x\right)$. Consider the case where the denominator in Eq. (7) is zero, the value of  $q_\phi(z \vert x)$ has to be zero as well otherwise the KL divergence goes to infinity. 
 
-The  [figure](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig10)  below demonstrates this. Note that the green region in the left figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = 0$, while the red region in the right figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = \infty$. In summary, the  [reverse KL divergence](https://blog.evjang.com/2016/08/variational-bayes.html)  has the effect of zero-forcing as minimizing it leads to  $q_\phi(z \vert x)$  being squeezed under  $p\left(z \vert x\right)$.
+The figure below demonstrates this. Note that the green region in the left figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = 0$, while the red region in the right figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = \infty$. In summary, the  [reverse KL divergence](https://blog.evjang.com/2016/08/variational-bayes.html)  has the effect of zero-forcing as minimizing it leads to  $q_\phi(z \vert x)$  being squeezed under  $p\left(z \vert x\right)$.
 
 <p align="center">
 <img src="images/ELBO/fig10.svg" alt="The zero-forcing effect of reverse KL divergence." width="800" />
@@ -211,7 +211,7 @@ $$
 \end{align*}
 $$
 
-So far, this is similar to what we have derived for the stationary case, i.e., Eq. (2) in the previous  [section](https://yunfanj.com/blog/2021/01/11/ELBO.html#amortized_vi). However, the following derivation will require some `factorizations` of the joint distribution and the variational posterior. Concretely, we factorize the temporal model  $p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right)$  and the approximation  $q_\theta \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t} \right)$ as
+So far, this is similar to what we have derived for the stationary case, i.e., Eq. (2) in the previous [section](#amortized-variational-inference-and-elb). However, the following derivation will require some `factorizations` of the joint distribution and the variational posterior. Concretely, we factorize the temporal model  $p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right)$  and the approximation  $q_\theta \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t} \right)$ as
 
 $$
 p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) = \prod_{\tau = 0}^t p \left(x_\tau \vert z_\tau\right) p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right),
