@@ -52,10 +52,10 @@ I have to say that this is not a bad fitting consider its simplicity. We can imp
 Let’s define this intuition formally. Given observations  `x`, we can build a  [latent variable model](https://en.wikipedia.org/wiki/Latent_variable_model)  with the variable  `z`  (we call it “_latent_” as it is not observed) such that the distribution of interest  `p(x)`  can be decomposed as 
 
 $$
-\begin{align}
+\begin{align*}
 p\left(x\right) = \int_z p\left(x \vert z\right) p\left(z\right) dz.
 \tag{1}
-\end{align}
+\end{align*}
 $$
 
 The intuition behind Eq. (1) is: We condition our observations on some variables that we don’t know. Therefore, the probability of observations will be the multiplication of the conditional probability and the prior probability of those unknown variables. Subsequently, we integrate out all cases of `unknowns` to get the distribution of interest. In the above naive case, the shift means and those weights we applied correspond to the term  $p\left(x \vert z\right)$, while the `transformation`, i.e., the summation, corresponds to the integration.
@@ -84,7 +84,7 @@ such that the increase of the number of parameters is  `amortized`. This is the 
 Now let’s revisit our objective to maximize the `log-likelihood` of observations  `x`  but with  $q_\phi \left(z \vert x\right)$  this time.
 
 $$
-\begin{align}
+\begin{align*}
 \log p_\theta(x) &= \log \int_z p_\theta(x, z) dz \\
 &= \log \int_z p_\theta(x, z) \frac{q_\phi(z \vert x)}{q_\phi(z \vert x)} dz \\
 &= \log \mathbb{E}_{z \sim q_\phi(z \vert x)} \left[ \frac{p_\theta(x, z)}{q_\phi(z \vert x)}\right] \\
@@ -92,7 +92,7 @@ $$
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \int_z q_\phi(z \vert x) \log \frac{1}{q_\phi(z \vert x)} dz \\
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \mathcal{H} \left(q_\phi \left(z \vert x\right) \right)
 \tag{2}.
-\end{align}
+\end{align*}
 $$
 In the above equation, the term  $\mathcal{H}\left(\cdot\right)$  is the  [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)). By definition, the term “_evidence_” is the value of a likelihood function evaluated with fixed parameters. 
 
@@ -132,30 +132,30 @@ The neural network with parameters  $\phi$  is sometimes called the  **_inferenc
 We care about the accuracy of the approximation performed by the inference network. As we mentioned earlier, the amortized variational inference leverages a distribution  $q_\phi \left(z \vert x\right)$  to approximate the true  _posterior_  of  $z$  given  $x$, i.e.,  $p\left(z \vert x\right)$. We choose  [Kullback–Leibler divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence)  as the metric to measure how close is  $q_\phi \left(z \vert x\right)$ to $p\left(z \vert x\right)$.
 
 $$
-\begin{align}
+\begin{align*}
 D_{KL}\left(q_\phi(z \vert x) \Vert p(z \vert x)\right) &= \int_z q_\phi (z \vert x) \log \frac{q_\phi(z \vert x)}{p(z \vert x)} dz\\
 &= -\int_z q_\phi(z \vert x) \log \frac{p(z \vert x)}{q_\phi(z \vert x)} dz\\
 &= -\int_z q_\phi(z \vert x) \log \frac{p(z,x)}{q_\phi(z \vert x)p(x)} dz \\
 &= - \left( \int_z q_\phi(z \vert x) \log \frac{p(z,x)}{q_\phi(z \vert x)} dz - \int_z q_\phi(z \vert x) \log p(x) dz\right) \\
 &= - \int_z q_\phi(z \vert x) \log \frac{p(z,x)}{q_\phi(z \vert x)} dz + \log p(x).
 \tag{3}
-\end{align}
+\end{align*}
 $$
 
 It is easy to show that the term  $\int_z q_\phi(z \vert x) \log \frac{p(z,x)}{q_\phi(z \vert x)} dz$  is equal to  $\mathcal{L}$, i.e., ELBO we defined previously. Rewriting Eq. (3) gives
 
 $$
-\begin{align}
+\begin{align*}
 \log p \left(x\right) = \mathcal{L} + D_{KL}\left(q_\phi(z \vert x) \Vert p(z \vert x)\right).
 \tag{4}
-\end{align}
+\end{align*}
 $$
 
 Although the true  _posterior_  $p \left(z \vert x\right)$  is unknown and hence we cannot calculate the KL divergence term analytically, an important property of `non-negativity` of KL divergence allows us to write Eq. (4) into an inequality:
-$$ \begin{align}
+$$ \begin{align*}
 \log p\left(x\right) \geq \mathcal{L},
 \tag{5}
-\end{align}
+\end{align*}
 $$
 
 which is consistent with Eq. (2) we derived before.
@@ -163,12 +163,12 @@ which is consistent with Eq. (2) we derived before.
 Another way to investigate ELBO is to rewrite it in the following way.
 
 $$
-\begin{align}
+\begin{align*}
 \mathcal{L} &=  \int_z q_\phi(z \vert x) \log \frac{p_\theta \left(x, z\right)}{q_\phi(z \vert x)} dz \\
 &= \int_z q_\phi(z \vert x) \log \frac{p_\theta \left(x \vert z\right)p\left(z\right)}{q_\phi(z \vert x)} dz \\
 &= \mathbb{E}_{z \sim q_\phi \left(z \vert x\right)} \left[p_\theta\left(x \vert z\right)\right] - D_{KL} \left(q_\phi \left(z \vert x\right) \Vert p\left(z\right)\right)
 \tag{6}
-\end{align}
+\end{align*}
 $$
 
 - It suggests that the `ELBO` is a trade-off between the reconstruction `accuracy` against the `complexity` of the variational  _posterior_. The KL divergence term can be interpreted as a measure of the additional information required to express the  _posterior_  relative to the  _prior_. As it approaches zero, the  _posterior_  is fully obtainable from the  _prior_. 
@@ -183,10 +183,10 @@ Readers who are interested in this convention are referred to  [Kingma  _et al._
 Additionally, let’s think about the reason behind the `KL divergence` we used to derive Eq. (3):
 
 $$
-\begin{align}
+\begin{align*}
 D_{KL}\left(q_\phi(z \vert x) \Vert p(z \vert x)\right) = \int_z q_\phi (z \vert x) \log \frac{q_\phi(z \vert x)}{p(z \vert x)} dz.
 \tag{7}
-\end{align}
+\end{align*}
 $$
 
 It suggests that the variational  _posterior_  $q_\phi(z \vert x)$  is prevented from spanning the whole space relative to the true  _posterior_  $p\left(z \vert x\right)$. Consider the case where the denominator in Eq. (7) is zero, the value of  $q_\phi(z \vert x)$ has to be zero as well otherwise the KL divergence goes to infinity. 
@@ -202,13 +202,13 @@ The  [figure](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig10)  below demons
 Consider the case that we wish to build a generative model  $p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right)$  for sequential data  $\mathbf{x}_{0:t} \equiv \left(x_0, x_1, \ldots, x_t \right)$  with a sequence of latent variable  $\mathbf{z}_{0:t} \equiv \left(z_0, z_1, \ldots, z_t \right)$, we can also derive a corresponding ELBO as a surrogate objective. Optimizing this objective leads to the maximization of the likelihood of the sequential observations.
 
 $$
-\begin{align}
+\begin{align*}
 \log p \left(\mathbf{x}_{0:t} \right) &= \log \int_{\mathbf{z}_{0:t}} p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) d\mathbf{z}_{0:t} \\
 &= \log \int_{\mathbf{z}_{0:t}} p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) \frac{q_\phi\left(\mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}  \right)}{q_\phi\left(\mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}  \right)}d\mathbf{z}_{0:t} \\
 &= \log \mathbb{E}_{\mathbf{z}_{0:t} \sim q_\phi \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}\right)} \left[ \frac{p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) }{q_\phi \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}\right)} \right] \\
 &\geq \mathbb{E}_{\mathbf{z}_{0:t}} \left[\log \frac{p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) }{q_\phi \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}\right)}\right] \text{by Jensen's inequality}
 \tag{8}
-\end{align}
+\end{align*}
 $$
 
 So far, this is similar to what we have derived for the stationary case, i.e., Eq. (2) in the previous  [section](https://yunfanj.com/blog/2021/01/11/ELBO.html#amortized_vi). However, the following derivation will require some `factorizations` of the joint distribution and the variational posterior. Concretely, we factorize the temporal model  $p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right)$  and the approximation  $q_\theta \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t} \right)$ as
@@ -232,12 +232,12 @@ To understand these `factorizations`, we can think that at each time step, the o
 With these two factorizations, we can further derive Eq. (8) by plugging Eq. (9) and Eq. (10):
 
 $$
-\begin{align}
+\begin{align*}
 &\mathbb{E}_{\mathbf{z}_{0:t}} \left[\log \frac{p \left(\mathbf{x}_{0:t}, \mathbf{z}_{0:t} \right) }{q_\phi \left( \mathbf{z}_{0:t} \vert \mathbf{x}_{0:t}\right)}\right] \\
 &= \mathbb{E}_{\mathbf{z}_{0:t}} \left[\log \frac{\prod_{\tau = 0}^t p \left(x_\tau \vert z_\tau\right) p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right)}{\prod_{\tau=0}^t q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)}\right] \\
 &= \mathbb{E}_{\mathbf{z}_{0:t}} \left[\sum_{\tau=0}^t \log p \left(x_\tau \vert z_\tau\right) + \log p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right) - \log q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)  \right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:t}} \left[\log p \left(x_\tau \vert z_\tau\right) + \log p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right) - \log q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right) \right].
-\end{align}
+\end{align*}
 \tag{11}
 $$
 
@@ -266,11 +266,11 @@ $$\mathbb{E}_{z_\tau \sim q_\phi \left(z_\tau \vert \mathbf{z}_{0:\tau-1}, \math
 > - Then we can factorize the joint distribution $q_\phi(\mathbf{z}_{0:\tau} \mid \mathbf{x}_{0:\tau})$ as a product of conditional distributions:
 
 $$
-\begin{align}
+\begin{align*}
 q_\phi(\mathbf{z}_{0:\tau} \mid \mathbf{x}_{0:\tau}) &= q_\phi(z_{0:\tau-1}, z_\tau \mid \mathbf{x}_{0:\tau}) \\
 & =  q_\phi(z_\tau \mid \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}) \cdot q_\phi(\mathbf{z}_{0:\tau-1} \mid \mathbf{x}_{0:\tau})  \text{ note } \mathbf{x}_{\tau} \text{ is invalid for } \mathbf{z}_{\tau - 1} \\
 &= q_\phi(z_\tau \mid \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}) \cdot q_\phi(\mathbf{z}_{0:\tau-1} \mid \mathbf{x}_{0:\tau-1})  
-\end{align}
+\end{align*}
 \tag{11-B}
 $$
 > - Take the expectation of your function with respect to this distribution. 
@@ -282,24 +282,24 @@ $$
 With these tricks at hands, Eq. (11) can be written as
 
 $$
-\begin{align}
+\begin{align*}
 & \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:t}} \left[\log p \left(x_\tau \vert z_\tau\right) + \log p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right) - \log q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right) \right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{z_\tau}\mathbb{E}_{\mathbf{z}_{0:\tau - 1}} \left[\log p \left(x_\tau \vert z_\tau\right) + \log p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right) - \log q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right) \right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:\tau - 1}}\mathbb{E}_{z_\tau} \left[\log p \left(x_\tau \vert z_\tau\right) + \log p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right) - \log q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right) \right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:\tau - 1}}\mathbb{E}_{z_\tau} \left[\log p \left(x_\tau \vert z_\tau\right) - \log \frac{q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)}{p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right)} \right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:\tau - 1}}\left[\mathbb{E}_{z_\tau} \left[\log p \left(x_\tau \vert z_\tau\right)\right] - \mathbb{E}_{z_\tau}\left[\log \frac{q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)}{p \left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right)} \right]\right] \\
 &= \sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:\tau - 1}}\left[\mathbb{E}_{z_\tau} \left[\log p \left(x_\tau \vert z_\tau\right)\right] - D_{KL}\left(q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)\Vert p\left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right)  \right)\right].
-\end{align}
+\end{align*}
 \tag{12}
 $$
 
 Put all of them together, we have derived a lower bound for the log-likelihood of temporal sequence. Great!
 
 $$
-\begin{align}
+\begin{align*}
 &\log p \left(\mathbf{x}_{0:t} \right) \geq \\
 &\sum_{\tau=0}^t \mathbb{E}_{\mathbf{z}_{0:\tau - 1}}\left[\mathbb{E}_{z_\tau} \left[\log p \left(x_\tau \vert z_\tau\right)\right] - D_{KL}\left(q_\phi \left(z_{\tau} \vert \mathbf{z}_{0:\tau-1}, \mathbf{x}_{0:\tau}\right)\Vert p\left(z_\tau \vert \mathbf{z}_{0:\tau -1}\right)  \right)\right]
-\end{align}
+\end{align*}
 \tag{13}
 $$
 
