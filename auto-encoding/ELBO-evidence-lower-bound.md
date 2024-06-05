@@ -94,12 +94,14 @@ $$
 \tag{2}.
 \end{align*}
 $$
-In the above equation, the term  $\mathcal{H}\left(\cdot\right)$  is the  [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)). By definition, the term “_evidence_” is the value of a likelihood function evaluated with fixed parameters. 
 
-With the definition of  
-$$\mathcal{L} = \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \mathcal{H} \left(q_\phi \left(z \vert x\right) \right),$$
 
-it turns out that  $\mathcal{L}$  sets a lower bound for the evidence of observations and maximizes  $\mathcal{L}$  will push up the log-likelihood of  $x$. Hence, we call  $\mathcal{L}$  the  **`evidence lower bound`**  (ELBO, sometimes referred to as  `variational lower bound`  as well).
+In the above equation, the term  $\mathcal{H}\left(\cdot\right)$  is the  [Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)). By definition, the term “_evidence_” is the value of a likelihood function evaluated with fixed parameters.
+
+
+With the definition of $$\mathcal{L} = \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \mathcal{H} \left(q_\phi \left(z \vert x\right) \right),$$
+
+it turns out that $\mathcal{L}$ sets a lower bound for the evidence of observations and maximizes  $\mathcal{L}$  will push up the log-likelihood of  $x$. Hence, we call  $\mathcal{L}$  the  **`evidence lower bound`**  (ELBO, sometimes referred to as  `variational lower bound`  as well).
 
 Now let’s think about the rationale behind  $\mathcal{L}$. 
 - First, we focus on the term  $\mathbb{E}_z \left[ \log p_\theta(x,z) \right]$  where  $z \sim q_\phi \left(z \vert x\right)$. Assuming that the neural network with parameters  $\theta$  gives us the joint distribution  $p_\theta \left(x, z\right)$, the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ that maximizes  $\mathcal{L}$ will be a  [Dirac delta](https://en.wikipedia.org/wiki/Dirac_delta_function)  which puts all the probability mass at the maximum of  $p_\theta \left(x, z\right)$. 
