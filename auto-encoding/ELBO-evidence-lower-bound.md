@@ -1,7 +1,7 @@
 # ELBO — What & Why
 
-> see the original article at https://yunfanj.com/blog/2021/01/11/ELBO.html, writen by Jan 11, 2021  
-> updated and noted by Changjiang Cai on June 4, 2024.  
+> - see the original article at https://yunfanj.com/blog/2021/01/11/ELBO.html, writen by Jan 11, 2021  
+> - updated and noted by Changjiang Cai on June 4, 2024.  
 
 
 LBO (evidence lower bound) is a key concept in  [Variational Bayesian Methods](https://en.wikipedia.org/wiki/Variational_Bayesian_methods). It transforms inference problems, which are always  _intractable_, into optimization problems that can be solved with, for example, gradient-based methods.
