@@ -32,22 +32,22 @@ We are interested in finding the distribution  `p(x)`  of some given observation
 Similar to  [the law of total probability](https://en.wikipedia.org/wiki/Law_of_total_probability)  which relates `marginal` probabilities to `conditional` probabilities, we can think that the distribution of interest  `p(x)`  can be **transformed** from a simple distribution, let’s say,  `p(z)`. We will assume that  p(z)  is  [a simple Gaussian distribution](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig2). Any other types of distributions can play the same role.
 
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig2.svg" alt="p(z) is a simple Gaussian distribution." width="500" />
-</p>
+</div>
 
 Now we will try to use  `p(z)`  with some transformation  `f(⋅)`  to fit  `p(x)`. Concretely, we select several shifted copies of  `p(z)`  and multiply each of them with a weight  $w_i$. The result is shown in the figure below.
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig3.svg" alt="A demo to fit p(x) with p(z) and some transformation." width="500" />
-</p>
+</div>
 
 
 I have to say that this is not a bad fitting consider its simplicity. We can improve this fitting by tweaking the weights, which leads to the following fitting.
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig4.svg" alt="We tweak the weights to improve the fitting." width="500" />
-</p>
+</div>
 
 Let’s define this intuition formally. Given observations  `x`, we can build a  [latent variable model](https://en.wikipedia.org/wiki/Latent_variable_model)  with the variable  `z`  (we call it “_latent_” as it is not observed) such that the distribution of interest  `p(x)`  can be decomposed as 
 
@@ -79,9 +79,9 @@ $$ q_\phi \left(z \vert x\right) \approx q_i \left(z\right) \quad \forall x_i \i
 
 such that the increase of the number of parameters is  `amortized`. This is the  <font color='red'>_amortized variational inference_ </font>, which is also referred to as  <font color='red'> _variational inference_ </font> in recent literature. Up to this point, as shown below, we have explicitly built a probabilistic graphical model to represent our problem where the observation  $x$  is conditioned on the latent variable  $z$  and we aim to infer  $z$  after observing  $x$.
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig5.svg" alt="A probabilistic graphical model showing relations between x and z" width="200" />
-</p>
+</div>
 
 Now let’s revisit our objective to maximize the `log-likelihood` of observations  `x`  but with  $q_\phi \left(z \vert x\right)$  this time.
 
@@ -111,23 +111,23 @@ Now let’s think about the rationale behind  $\mathcal{L}$.
 	- In the case where data being averaged are fixed but weights can be varied (with the constraint that all weights sum to one), you just need to put 1 for the largest data point and 0 for others to maximize that average. 
 	- With this intuition, we get the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ shown below.
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig7.svg" alt="The optimal distribution is a Dirac delta." width="500" />
-</p>
+</div>
 
 - However, the story becomes different when we consider the second term in  $\mathcal{L}$, i.e., the `entropy` term. This term tells us the `uncertainty` of a distribution. Samples drawn from a distribution with higher entropy will become more uncertain. Sadly, the entropy of the optimal distribution  $q_\phi^\ast \left(z \vert x\right)$ we have just found is `negative infinity`. We can show this by constructing a random variable  `x`  drawn from a uniform distribution  $x \sim \mathcal{U} \left(x_0 - \epsilon, x_0 + \epsilon\right)$. Its entropy is  $\mathbb{E}_x \left[\log \frac{1}{p\left(x\right)}\right] = \log\left(2 \epsilon\right)$.  As  $\epsilon$  approaching zero, this distribution degenerates to a Dirac delta with entropy  $\lim_{\epsilon \to 0}\log\left(2\epsilon\right) = -\infty$. The figure below shows the entropy varies as a function of  $q_\phi \left(z \vert x\right)$.
 
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig8.svg" alt="The entropy varies as a function of different distributions." width="500" />
-</p>
+</div>
 
 Put all of them together, the maximization of  $\mathcal{L}$  tries to find an optimal distribution $q_\phi^\ast \left(z \vert x\right)$ which not only fits peaks of  $p_\theta \left(x, z\right)$.  but also spreads as wide as possible. A visualization is given in the demo below.
 
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig9.gif" alt="A visualization of maximizing ELBO." width="500" />
-</p>
+</div>
 
 The neural network with parameters  $\phi$  is sometimes called the  **_inference network_**, with the distribution  $q_\phi\left(z \vert x\right)$  that it parameterizes named as the  **_variational posterior_**.
 
@@ -197,9 +197,9 @@ It suggests that the variational  _posterior_  $q_\phi(z \vert x)$  is prevented
 
 The figure below demonstrates this. Note that the green region in the left figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = 0$, while the red region in the right figure indicates where  $\frac{q_\phi(z \vert x)}{p(z \vert x)} = \infty$. In summary, the  [reverse KL divergence](https://blog.evjang.com/2016/08/variational-bayes.html)  has the effect of zero-forcing as minimizing it leads to  $q_\phi(z \vert x)$  being squeezed under  $p\left(z \vert x\right)$.
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig10.svg" alt="The zero-forcing effect of reverse KL divergence." width="800" />
-</p>
+</div>
 
 ## Extension: ELBO for Temporal Sequence
 
