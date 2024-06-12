@@ -60,7 +60,9 @@ $$
 
 The intuition behind Eq. (1) is: We condition our observations on some variables that we don’t know. Therefore, the probability of observations will be the multiplication of the conditional probability and the prior probability of those unknown variables. Subsequently, we integrate out all cases of `unknowns` to get the distribution of interest. In the above naive case, the shift means and those weights we applied correspond to the term  $p\left(x \vert z\right)$, while the `transformation`, i.e., the summation, corresponds to the integration.
 
-Despite the convenience provided by decomposing a very complicated distribution into the multiplication of a simple Gaussian conditional distribution and a Gaussian prior distribution, there is a `PROBLEM` — the integration. It is  <font color='red'> _intractable_ </font> because it is performed `over the whole latent space`, which is impractical when latent variables are continuous.
+Despite the convenience provided by decomposing a very complicated distribution into the multiplication of a simple Gaussian conditional distribution and a Gaussian prior distribution, there is a `PROBLEM` — the integration. 
+
+It is  <font color='red'> _intractable_ </font> because it is performed `over the whole latent space`, which is impractical when latent variables are continuous.
 
 Besides the above-mentioned intractable integration, another question would be that how to obtain a function that transforms  `p(z)`  into  `p(x)`. In other words, how to get the conditional distribution $p\left(x \vert z\right)$. Despite that this function seems to be extremely non-linear, it is still not difficult to solve this problem as we know that neural networks are universal function approximators that can approximate any functions to arbitrary precisions. Therefore, we could use a neural network with parameters  $\theta$  to approximate the distribution  $p\left(x \vert z\right)$, which gives us  $p_\theta \left(x \vert z\right)$. In the subsequent sections, we will see how we can avoid the intractable integration and optimize our parameters.
 
@@ -84,7 +86,7 @@ such that the increase of the number of parameters is  `amortized`. This is the 
 Now let’s revisit our objective to maximize the `log-likelihood` of observations  `x`  but with  $q_\phi \left(z \vert x\right)$  this time.
 
 $$
-\begin{align*}
+`\begin{align*}
 \log p_\theta(x) &= \log \int_z p_\theta(x, z) dz \\
 &= \log \int_z p_\theta(x, z) \frac{q_\phi(z \vert x)}{q_\phi(z \vert x)} dz \\
 &= \log \mathbb{E}_{z \sim q_\phi(z \vert x)} \left[ \frac{p_\theta(x, z)}{q_\phi(z \vert x)}\right] \\
@@ -92,7 +94,7 @@ $$
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \int_z q_\phi(z \vert x) \log \frac{1}{q_\phi(z \vert x)} dz \\
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \mathcal{H} \left(q_\phi \left(z \vert x\right) \right)
 \tag{2}.
-\end{align*}
+\end{align*}`
 $$
 
 
