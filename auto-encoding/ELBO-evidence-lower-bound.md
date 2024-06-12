@@ -25,9 +25,9 @@ In this post, I’ll introduce an important concept in  [Variational Bayesian (V
 We are interested in finding the distribution  `p(x)`  of some given observations  `x`. Sometimes, this distribution can be fairly simple. For example, if the observations are the outcomes of flipping a coin,  `p(x)`  will be a  [Bernoulli distribution](https://en.wikipedia.org/wiki/Bernoulli_distribution). In a continuous case,  `p(x)`  will be a simple  [Gaussian distribution](https://en.wikipedia.org/wiki/Normal_distribution)  if you are measuring the heights of people. However, sadly, we generally encounter observations with complicated distributions. The  figure below, for instance, shows such a  `p(x)`, which is a  [mixed Gaussian distribution](https://en.wikipedia.org/wiki/Mixture_model#Gaussian_mixture_model).
 
 
-<p align="center">
+<div align="center">
 <img src="images/ELBO/fig1.svg" alt="The distribution shown is fairly complicated. It is a Gaussian mixture model with 3 Gaussian distributions." width="500" />
-</p>
+</div>
 
 Similar to  [the law of total probability](https://en.wikipedia.org/wiki/Law_of_total_probability)  which relates `marginal` probabilities to `conditional` probabilities, we can think that the distribution of interest  `p(x)`  can be **transformed** from a simple distribution, let’s say,  `p(z)`. We will assume that  p(z)  is  [a simple Gaussian distribution](https://yunfanj.com/blog/2021/01/11/ELBO.html#fig2). Any other types of distributions can play the same role.
 
@@ -86,7 +86,7 @@ such that the increase of the number of parameters is  `amortized`. This is the 
 Now let’s revisit our objective to maximize the `log-likelihood` of observations  `x`  but with  $q_\phi \left(z \vert x\right)$  this time.
 
 $$
-`\begin{align*}
+\begin{align*}
 \log p_\theta(x) &= \log \int_z p_\theta(x, z) dz \\
 &= \log \int_z p_\theta(x, z) \frac{q_\phi(z \vert x)}{q_\phi(z \vert x)} dz \\
 &= \log \mathbb{E}_{z \sim q_\phi(z \vert x)} \left[ \frac{p_\theta(x, z)}{q_\phi(z \vert x)}\right] \\
@@ -94,7 +94,7 @@ $$
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \int_z q_\phi(z \vert x) \log \frac{1}{q_\phi(z \vert x)} dz \\
 &= \mathbb{E}_z \left[ \log p_\theta(x,z) \right] + \mathcal{H} \left(q_\phi \left(z \vert x\right) \right)
 \tag{2}.
-\end{align*}`
+\end{align*}
 $$
 
 
