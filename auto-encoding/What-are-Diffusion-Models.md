@@ -66,6 +66,7 @@ $$
 \begin{aligned} 
 \mathbf{z} & \sim q_\phi(\mathbf{z} \vert \mathbf{x}^{(i)}) = \mathcal{N}( \mathbf{z}; \boldsymbol{\mu}^{(i)}, \boldsymbol{\sigma}^{2(i)}\boldsymbol{I}) \\
 \mathbf{z} & = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon} \text{,  where } \boldsymbol{\epsilon} \sim \mathcal{N}(0, \boldsymbol{I}) \qquad \text{; Reparameterization trick.}
+\tag{2}
 \end{aligned} 
 $$
 
@@ -73,15 +74,14 @@ $$
 
  ---
 
-
-Let $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$ :
+Then given equation (2), we can convert equation (1) as below. Let $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$ :
 
 $$
 \begin{aligned}
 \mathbf{x}_t 
 &= \sqrt{\alpha_t}\mathbf{x}_{t-1} + \sqrt{1 - \alpha_t}\boldsymbol{\epsilon}_{t-1} \quad \text{ ;where } \boldsymbol{\epsilon}_{t-1}, \boldsymbol{\epsilon}_{t-2}, \dots \sim \mathcal{N}(\mathbf{0}, \mathbf{I}) \\
 
-& ( \Rightarrow  \text{ to subsitute: } \mathbf{x}_{t-1} = \sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \text{ , via } t \leftarrow t-1) \\
+ ( &\Rightarrow  \text{ to subsitute: } \mathbf{x}_{t-1} = \sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \text{ , via } t \leftarrow t-1) \\
 
 &= \sqrt{\alpha_t} \left(\sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \right) + \sqrt{ 1 - \alpha_t} \boldsymbol{\epsilon}_{t-1} \\
 
@@ -92,13 +92,13 @@ $$
 &= \sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon} \\
 q(\mathbf{x}_t \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1 - \bar{\alpha}_t)\mathbf{I})
 \end{aligned}
-\tag{2}
+\tag{3}
 $$
 
 
 (*) Recall that when we merge two Gaussians  with different variance, $\mathcal{N}(\mathbf{0}, \sigma_1^2\mathbf{I})$ and $\mathcal{N}(\mathbf{0}, \sigma_2^2\mathbf{I})$, the new distribution is $\mathcal{N}(\mathbf{0}, (\sigma_1^2 + \sigma_2^2)\mathbf{I})$. Here the merged standard deviation is $\sqrt{(1 - \alpha_t) + \alpha_t (1-\alpha_{t-1})} = \sqrt{1 - \alpha_t\alpha_{t-1}}$.
 
-Usually, we can afford a larger update step when the sample gets noisier, so $\beta_1 < \beta_2 < \dots < \beta_T$ and therefore $\bar{\alpha}_1 > \dots > \bar{\alpha}_T$.
+Usually, we can afford `a larger update step` when the sample gets noisier, so $\beta_1 < \beta_2 < \dots < \beta_T$ and therefore $\bar{\alpha}_1 > \dots > \bar{\alpha}_T$.
 
 
 #### Connection with stochastic gradient Langevin dynamics
@@ -109,7 +109,7 @@ $$
 \mathbf{x}_t = \mathbf{x}_{t-1} + \frac{\delta}{2} \nabla_\mathbf{x} \log p(\mathbf{x}_{t-1}) + \sqrt{\delta} \boldsymbol{\epsilon}_t
 ,\quad\text{where }
 \boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I})
-\tag {3}
+\tag {4}
 $$
 
 where $\delta$ is the step size. When $T \to \infty, \epsilon \to 0$, $\mathbf{x}_T$ equals to the true probability density $p(\mathbf{x})$.
@@ -126,10 +126,10 @@ q(\mathbf{x}_{t-1} \vert \mathbf{x}_t)
 &=  \frac{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1})  q(\mathbf{x}_{t-1}) }{ q(\mathbf{x}_t ) } \\
 
 &=  \frac{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1})  q(\mathbf{x}_{t-1}) }{ \int_{x_0} q\left( \mathbf {x_t}, x_{0} \right) dx_{0} }
-\end{aligned} \tag{4}
+\end{aligned} \tag{5}
 $$
 
-The integral part makes $q(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ intractable.
+The integral part makes $q(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ `intractable`.
 
 Therefore we need to learn a model $p_\theta$ to approximate these conditional probabilities in order to run the **reverse diffusion process**. 
 
@@ -137,7 +137,7 @@ Therefore we need to learn a model $p_\theta$ to approximate these conditional p
 $$ 
 p_\theta(\mathbf{x}_{0:T}) = p(\mathbf{x}_T) \prod^T_{t=1} p_\theta(\mathbf{x}_{t-1} \vert \mathbf{x}_t) \quad
 p_\theta(\mathbf{x}_{t-1} \vert \mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \boldsymbol{\mu}_\theta(\mathbf{x}_t, t), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t))
-\tag {5}
+\tag {6}
 $$
 
 
@@ -152,20 +152,56 @@ It is noteworthy that the reverse conditional probability is tractable when cond
 
 $$
 q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) = \mathcal{N}(\mathbf{x}_{t-1}; \color{blue}{\tilde{\boldsymbol{\mu}}}(\mathbf{x}_t, \mathbf{x}_0), \color{red}{\tilde{\beta}_t} \mathbf{I})
-\tag{6}
+\tag{7}
 $$
 
+Let us try to figure out how to get equation (7). 
+Given Eq (3), we have 
+$$
+\begin{aligned}
+q(\mathbf{x}_t \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1 - \bar{\alpha}_t)\mathbf{I}) \\
+&= \frac{1}{\sqrt{2\pi (1 - \bar{\alpha}_t)}} \exp{\left( -\frac{1}{2} \frac{\left( \mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0 \right)^2}{1 - \bar{\alpha}_t} \right)} \\
+& \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0\right)^2}{1 - \bar{\alpha}_t} \right)}
+\tag {8.1}
+\end{aligned}
+$$
+
+Then let $t \leftarrow (t-1)$, we have 
+
+$$
+\begin{aligned}
+q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_{t-1}; \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0, (1 - \bar{\alpha}_{t-1})\mathbf{I}) \\
+& \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_{t-1} - \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0 \right)^2}{1 - \bar{\alpha}_{t-1}} \right)}
+\tag {8.2}
+\end{aligned}
+$$
+
+Also, Eq (1) with $\alpha_t = 1 - \beta_t$ gives that 
+$$
+\begin{aligned}
+q(\mathbf{x}_t \vert \mathbf{x}_{t-1}) &= \mathcal{N}(\mathbf{x}_t; \sqrt{\alpha_t} \mathbf{x}_{t-1}, \beta_t\mathbf{I}) \\
+& \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_{t} - \sqrt{{\alpha}_{t}} \mathbf{x}_{t-1} \right)^2}{\beta_{t}} \right)}
+\tag{8.3}
+\end{aligned}
+$$
 
 Using Bayes' rule, we have:
 
 $$
 \begin{aligned}
 q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) 
-&= q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_0) \frac{ q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) }{ q(\mathbf{x}_t \vert \mathbf{x}_0) } \\
+&= \underbrace{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_0)}_{\text{Eq(8.3)}} 
+\frac{ \overbrace{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)}^{\text{Eq(8.2)}} }{ \underbrace{q(\mathbf{x}_t \vert \mathbf{x}_0)}_{\text{Eq(8.1)}}} \\
 
 &\propto \exp \Big(-\frac{1}{2} \big(\frac{(\mathbf{x}_t - \sqrt{\alpha_t} \mathbf{x}_{t-1})^2}{\beta_t} + \frac{(\mathbf{x}_{t-1} - \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0)^2}{1-\bar{\alpha}_{t-1}} - \frac{(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0)^2}{1-\bar{\alpha}_t} \big) \Big) \\
 &= \exp \Big(-\frac{1}{2} \big(\frac{\mathbf{x}_t^2 - 2\sqrt{\alpha_t} \mathbf{x}_t \color{blue}{\mathbf{x}_{t-1}} \color{black}{+ \alpha_t} \color{red}{\mathbf{x}_{t-1}^2} }{\beta_t} + \frac{ \color{red}{\mathbf{x}_{t-1}^2} \color{black}{- 2 \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0} \color{blue}{\mathbf{x}_{t-1}} \color{black}{+ \bar{\alpha}_{t-1} \mathbf{x}_0^2}  }{1-\bar{\alpha}_{t-1}} - \frac{(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0)^2}{1-\bar{\alpha}_t} \big) \Big) \\
-&= \exp\Big( -\frac{1}{2} \big( \color{red}{(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}})} \mathbf{x}_{t-1}^2 - \color{blue}{(\frac{2\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{2\sqrt{\bar{\alpha}_{t-1}}}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)} \mathbf{x}_{t-1} \color{black}{ + C(\mathbf{x}_t, \mathbf{x}_0) \big) \Big)}
+&= \exp\Big( -\frac{1}{2} \big( \color{red}{
+  \underbrace{(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}})}_{1/{\tilde{\beta}_t }}
+  } {\mathbf{x}_{t-1}^2} - \color{blue}{
+    \underbrace{(\frac{2\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{2\sqrt{\bar{\alpha}_{t-1}}}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)}_{2 \cdot A}
+    
+  } \mathbf{x}_{t-1} \color{black}{ + C(\mathbf{x}_t, \mathbf{x}_0) \big) \Big)}
+\tag {9}
 \end{aligned}
 $$
 
@@ -178,25 +214,60 @@ $$
 &= 1/(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}) 
 = 1/(\frac{\alpha_t - \bar{\alpha}_t + \beta_t}{\beta_t(1 - \bar{\alpha}_{t-1})})
 = \color{green}{\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \cdot \beta_t} \\
+
+( &\Rightarrow  \text{try to construct: } \left(\mathbf{x}_{t-1} - \mu_{x_{t-1}} \right)^2 \text{ to find the mean } \mu_{x_{t-1}} \text{ of the Gaussian}  \\
+ &\Rightarrow  \text{so have to get : } 2 \cdot \mathbf{x}_{t-1} \cdot \mu_{x_{t-1}}  \text{ and so on. It is a math trick } \dots ) \\
+
 \tilde{\boldsymbol{\mu}}_t (\mathbf{x}_t, \mathbf{x}_0)
-&= (\frac{\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1} }}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)/(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}) \\
+&= {\underbrace{(\frac{\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1} }}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)}_{A}} / \underbrace{(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}})}_{ 1/{\tilde{\beta}_t } } \\
+
+&\Rightarrow  \text{equals: }  A \cdot {\tilde{\beta}_t } ) \text{, i.e., } \\
+
 &= (\frac{\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1} }}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0) \color{green}{\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \cdot \beta_t} \\
 &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \mathbf{x}_0\\
+\tag {10}
 \end{aligned}
 $$
 
+Thanks to the nice property as shown in Eq 3, i.e.,
+$ \mathbf{x}_t = \sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}$, we can represent $\mathbf{x}_0$ by $\mathbf{x}_t$, i.e.,
 
-Thanks to the <a href="#nice">nice property</a>, we can represent $\mathbf{x}_0 = \frac{1}{\sqrt{\bar{\alpha}_t}}(\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t)$ and plug it into the above equation and obtain:
+$$\mathbf{x}_0 = \frac{1}{\sqrt{\bar{\alpha}_t}}(\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t)
+\tag {11}
+$$
+
+Then plug Eq (11) into the above equation Eq (10) and obtain:
 
 $$
 \begin{aligned}
 \tilde{\boldsymbol{\mu}}_t
 &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}}(\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t) \\
-&= \color{cyan}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)}
+&=  \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}}\mathbf{x}_t  -  \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}} \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t \\
+
+&=  \left( \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} + \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_{t}}} \frac{ \beta_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_{t}}} \frac{\beta_t}{1 - \bar{\alpha}_t} \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t \\
+
+(&\Rightarrow  \text{here we use: } \bar{\alpha}_t = \bar{\alpha}_{t-1} \cdot \alpha_t  \text{, and }   \beta_t = 1 - \alpha_t ) \\
+
+& =  \left( \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} + \frac{1}{\sqrt{\alpha_{t}}} \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1})}{\sqrt{\alpha_t}(1 - \bar{\alpha}_t)} + \frac{1}{\sqrt{\alpha_{t}}} \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} +  \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t -  \alpha_t \bar{\alpha}_{t-1} + 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t - \bar{\alpha}_{t} + 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{ 1- \bar{\alpha}_{t} }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+& =  \frac{1}{\sqrt{\alpha_{t}}} \cdot 1  \cdot \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
+
+
+&= \color{cyan}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)} \quad \quad \text{(12)}
 \end{aligned}
 $$
 
-As demonstrated in Fig. 2., such a setup is very similar to <a href="https://lilianweng.github.io/posts/2018-08-12-vae/">VAE</a> and thus we can use the variational lower bound to optimize the negative log-likelihood.
+As demonstrated in Fig. 2., such a setup is very similar to <a href="https://lilianweng.github.io/posts/2018-08-12-vae/">VAE</a> and thus we can use the `variational lower bound (VLB)` to optimize the negative log-likelihood.
 
 $$
 \begin{aligned}
@@ -207,10 +278,11 @@ $$
 &= \mathbb{E}_q \Big[ \log \frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \\
 \text{Let }L_\text{VLB} 
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})} \Big[ \log \frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \geq - \mathbb{E}_{q(\mathbf{x}_0)} \log p_\theta(\mathbf{x}_0)
+\tag {13}
 \end{aligned}
 $$
 
-It is also straightforward to get the same result using Jensen&rsquo;s inequality. Say we want to minimize the cross entropy as the learning objective,
+It is also straightforward to get the same result using `Jensen's inequality`. Say we want to minimize the cross entropy as the learning objective,
 
 $$
 \begin{aligned}
@@ -221,10 +293,11 @@ L_\text{CE}
 &= - \mathbb{E}_{q(\mathbf{x}_0)} \log \Big( \mathbb{E}_{q(\mathbf{x}_{1:T} \vert \mathbf{x}_0)} \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \Big) \\
 &\leq - \mathbb{E}_{q(\mathbf{x}_{0:T})} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})}\Big[\log \frac{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})}{p_\theta(\mathbf{x}_{0:T})} \Big] = L_\text{VLB}
+\tag{14}
 \end{aligned}
 $$
 
-To convert each term in the equation to be analytically computable, the objective can be further rewritten to be a combination of several KL-divergence and entropy terms (See the detailed step-by-step process in Appendix B in <a href="https://arxiv.org/abs/1503.03585">Sohl-Dickstein et al., 2015</a>):
+To convert each term in the equation to be analytically computable, the objective can be further rewritten to be a combination of several KL-divergence and entropy terms (See the detailed step-by-step process in Appendix B in [Sohl-Dickstein et al., 2015](https://arxiv.org/abs/1503.03585)):
 
 $$
 \begin{aligned}
@@ -237,7 +310,8 @@ L_\text{VLB}
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \sum_{t=2}^T \log \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{q(\mathbf{x}_1 \vert \mathbf{x}_0)} + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big]\\
 &= \mathbb{E}_q \Big[ \log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)} + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} - \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1) \Big] \\
-&= \mathbb{E}_q [\underbrace{D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T))}_{L_T} + \sum_{t=2}^T \underbrace{D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t))}_{L_{t-1}} \underbrace{- \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}_{L_0} ]
+&= \mathbb{E}_q [\underbrace{D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T))}_{L_T} + \sum_{t=2}^T \underbrace{D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t))}_{L_{t-1}} \underbrace{- \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}_{L_0} ] 
+\tag {15}
 \end{aligned}
 $$
 
