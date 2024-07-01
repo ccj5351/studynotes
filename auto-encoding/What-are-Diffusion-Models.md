@@ -176,7 +176,7 @@ q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_{t-1}; \sqrt{\b
 \end{aligned}
 $$
 
-Also, Eq (1) with $\alpha_t = 1 - \beta_t$ gives that 
+Also, Eq (1) with $\alpha_t = 1 - \beta_t$ gives 
 $$
 \begin{aligned}
 q(\mathbf{x}_t \vert \mathbf{x}_{t-1}) &= \mathcal{N}(\mathbf{x}_t; \sqrt{\alpha_t} \mathbf{x}_{t-1}, \beta_t\mathbf{I}) \\
@@ -210,7 +210,7 @@ where $C(\mathbf{x}_t, \mathbf{x}_0)$ is some function not involving $\mathbf{x}
 
 $$
 \begin{aligned}
-\tilde{\beta}_t 
+\text{the standard variance } \tilde{\beta}_t 
 &= 1/(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}) 
 = 1/(\frac{\alpha_t - \bar{\alpha}_t + \beta_t}{\beta_t(1 - \bar{\alpha}_{t-1})})
 = \color{green}{\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \cdot \beta_t} \\
@@ -303,7 +303,8 @@ $$
 \begin{aligned}
 L_\text{VLB} 
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})} \Big[ \log\frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \\
-&= \mathbb{E}_q \Big[ \log\frac{\prod_{t=1}^T q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{ p_\theta(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t) } \Big] \\
+(&\Rightarrow  \text{ to consider the forward diffusion process and reverse diffusion process }  \\ 
+&= \mathbb{E}_q \Big[ \log\frac{ \overbrace{\prod_{t=1}^T q(\mathbf{x}_t\vert\mathbf{x}_{t-1}) }^{\text{forward diffusion process, see Eq (1)}}}{ \underbrace{p_\theta(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t) } _{\text{reverse diffusion process, see Eq 6}} } \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=1}^T \log \frac{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \Big( \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}\cdot \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1}\vert\mathbf{x}_0)} \Big) + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
