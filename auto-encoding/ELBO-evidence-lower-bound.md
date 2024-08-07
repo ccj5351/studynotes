@@ -58,7 +58,7 @@ p\left(x\right) = \int_z p\left(x \vert z\right) p\left(z\right) dz.
 \end{align*}
 $$
 
-The intuition behind Eq. (1) is: We condition our observations on some variables that we don’t know. Therefore, the probability of observations will be the multiplication of the conditional probability and the prior probability of those unknown variables. Subsequently, we integrate out all cases of `unknowns` to get the distribution of interest. In the above naive case, the shift means and those weights we applied correspond to the term  $p\left(x \vert z\right)$, while the `transformation`, i.e., the summation, corresponds to the integration.
+The intuition behind Eq. (1) is: We condition our observations on some variables that we don’t know. Therefore, the probability of observations will be the multiplication of the conditional probability and the prior probability of those unknown variables. Subsequently, we integrate out all cases of `unknowns` to get the distribution of interest. In the above naive case, the shifted means (corresponding to the non-zero means $\mu \neq $ 0 of the Normal distributions) and those weights we applied correspond to the term  $p\left(x \vert z\right)$, while the `transformation`, i.e., the summation, corresponds to the integration.
 
 Despite the convenience provided by decomposing a very complicated distribution into the multiplication of a simple Gaussian conditional distribution and a Gaussian prior distribution, there is a `PROBLEM` — the integration. 
 
