@@ -57,6 +57,7 @@ Both the forward and reverse process indexed by $t$ happen for some number of fi
 
 Let's write this down more formally, as ultimately we need a tractable loss function which our neural network needs to optimize. 
 
+### Forward diffusion process $q$
 Let $q(\mathbf{x}_0)$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $\mathbf{x}_0 \sim q(\mathbf{x}_0)$. We define the forward diffusion process $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $0 < \beta_1 < \beta_2 < ... < \beta_T < 1$ as
 $$
 q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
@@ -65,62 +66,122 @@ $$
 
 Recall that a normal distribution (also called Gaussian distribution) is defined by 2 parameters: a mean $\mu$ and a variance $\sigma^2 \geq 0$. 
 
-Basically, each new (slightly noisier) image $\mathbf{x}_t$ at time step $t$ is drawn from a **conditional Gaussian distribution** with $\mathbf{\mu}_t = \sqrt{1 - \beta_t} \mathbf{x}_{t-1}$ and $\sigma^2_t = \beta_t$, which we can do by leveraging the <font color='red'>**reparameterization trick**</font> to sample $\mathbf{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and then setting 
+Basically, each new (slightly noisier) image $\mathbf{x}_t$ at time step $t$ is drawn from a **conditional Gaussian distribution** with $\mathbf{\mu}_t = \sqrt{1 - \beta_t} \mathbf{x}_{t-1}$ and $\sigma^2_t = \beta_t$, which we can do by leveraging the <font color='red'>**reparameterization trick**</font> to sample $\mathbf{\epsilon_{t-1}} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and then setting 
 
-$$\mathbf{x}_t = \sqrt{1 - \beta_t} \mathbf{x}_{t-1} +  \sqrt{\beta_t} \mathbf{\epsilon}
+$$\mathbf{x}_t = \sqrt{1 - \beta_t} \mathbf{x}_{t-1} +  \sqrt{\beta_t} \mathbf{\epsilon_{t-1}}
 \tag{2}
 $$
 
 
-## My study notes
-> Why the forward diffusion process is doable?
+---
 
-It is because the forward conditional Gaussian probability $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ as in Eq (1) is known, and we can easily get $\mathbf{x}_t$ from $\mathbf{x}_{t-1}$ using this conditional probability and the **reparameterization trick** as in Eq (2).
-
-This reparameterization trick explains why the forward diffusion process is doable:
-> - At $t=0$, we sample a real image  $x_0$ from a data distribution (e.g., sample an image of a cat from ImageNet), 
-> - At new steps $t$, then we can sample some noise , which is added to the image of the previous time step. Given a sufficiently large  T  and a well behaved schedule for adding noise at each time step, you end up with what is called an isotropic Gaussian distribution at  t=T  via a gradual process.
-
-Since $\mathbf{\mu}_t = \sqrt{1 - \beta_t} \mathbf{x}_{t-1}$ and $\sigma^2_t = \beta_t$ are known for each step $t$, then we can get all the new images $\mathbf{x}_t$ in a forward diffusion pass.
-
-
-Note that the $\beta_t$ aren't constant at each time step $t$ (hence the subscript) --- in fact one defines a so-called **"variance schedule"**, which can be linear, quadratic, cosine, etc. as we will see further (a bit like a learning rate schedule). 
+Note that the $\beta_t$ aren't constant at each time step $t$ (hence the subscript) --- in fact one defines a so-called <font color='red'>**"variance schedule"**</font>, which can be linear, quadratic, cosine, etc. as we will see further (a bit like a learning rate schedule). 
 
 So starting from $\mathbf{x}_0$, we end up with $\mathbf{x}_1,  ..., \mathbf{x}_t, ..., \mathbf{x}_T$, where $\mathbf{x}_T$ is pure Gaussian noise if we set the schedule appropriately.
 
+### Reverse denoising diffusion process $p_\theta$
+
 Now, if we knew the conditional distribution $p(\mathbf{x}_{t-1} | \mathbf{x}_t)$, then we could run the process in reverse: by sampling some random Gaussian noise $\mathbf{x}_T$, and then gradually "denoise" it so that we end up with a sample from the real distribution $\mathbf{x}_0$.
 
-However, we don't know $p(\mathbf{x}_{t-1} | \mathbf{x}_t)$. It's intractable since it requires knowing the distribution of all possible images in order to calculate this conditional probability. Hence, we're going to leverage a neural network to **approximate (learn) this conditional probability distribution**, let's call it $p_\theta (\mathbf{x}_{t-1} | \mathbf{x}_t)$, with $\theta$ being the parameters of the neural network, updated by gradient descent. 
+However, we don't know $p(\mathbf{x}_{t-1} | \mathbf{x}_t)$. It's <font color='red'>**intractable**</font> since it requires knowing the distribution of all possible images in order to calculate this conditional probability. Hence, we're going to leverage a neural network to **approximate (learn) this conditional probability distribution**, let's call it $p_\theta (\mathbf{x}_{t-1} | \mathbf{x}_t)$, with $\theta$ being the parameters of the neural network, updated by gradient descent. 
 
 Ok, so we need a neural network to represent a (conditional) probability distribution of the backward process. If we assume this reverse process is Gaussian as well, then recall that any Gaussian distribution is defined by 2 parameters:
 * a mean parametrized by $\mu_\theta$;
 * a variance parametrized by $\Sigma_\theta$;
 
 so we can parametrize the process as 
-$$ p_\theta (\mathbf{x}_{t-1} | \mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \mu_\theta(\mathbf{x}_{t},t), \Sigma_\theta (\mathbf{x}_{t},t))$$
+
+$$ p_\theta (\mathbf{x}_{t-1} | \mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \mu_\theta(\mathbf{x}_{t},t), \Sigma_\theta (\mathbf{x}_{t},t))
+\tag{3}
+$$
+
 where the mean and variance are also conditioned on the noise level $t$.
 
 Hence, our neural network needs to learn/represent the mean and variance. However, the DDPM authors decided to **keep the variance fixed, and let the neural network only learn (represent) the mean $\mu_\theta$ of this conditional probability distribution**. From the paper:
 
-> First, we set $\Sigma_\theta ( \mathbf{x}_t, t) = \sigma^2_t \mathbf{I}$ to untrained time dependent constants. Experimentally, both $\sigma^2_t = \beta_t$ and $\sigma^2_t  = \tilde{\beta}_t$ (see paper) had similar results. 
+> First, we set $\Sigma_\theta ( \mathbf{x}_t, t) = \sigma^2_t \mathbf{I}$ to **untrained** time dependent constants. Experimentally, both $\sigma^2_t = \beta_t$ and $\sigma^2_t  = \tilde{\beta}_t$ (see paper) had similar results. 
 
 This was then later improved in the [Improved diffusion models](https://openreview.net/pdf?id=-NEXDKk8gZ) paper, where a neural network also learns the variance of this backwards process, besides the mean.
 
 So we continue, assuming that our neural network only needs to learn/represent the mean of this conditional probability distribution.
 
+
+#### My study notes
+> Q1: Why the forward diffusion process is doable or more specificaly, fixed and pre-defined (aka non-learning)?
+
+It is because there are no unknown parameters in the forward conditional Gaussian probability $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ as in Eq (1). We can easily get $\mathbf{x}_t$ from $\mathbf{x}_{t-1}$ based on this conditional probability and the **reparameterization trick** as in Eq (2).
+
+This reparameterization trick explains why the forward diffusion process is doable and how it is conducted:
+- At $t=0$, we sample a real image  $x_0$ from a data distribution (e.g., to sample an image of a cat from ImageNet), 
+- Given Eq (2), at new steps $t \in \{ 1,2, \dots, T \}$ , then we can sample some noise $\mathbf{\epsilon_{t-1}}$, which is added to the image $\mathbf{x_{t-1}}$ of the previous time step. 
+- Then we can get all the new images $\mathbf{x}_t$ in forward diffusion runs.
+
+
+> Q2: Why the reverse denoising diffusion process is intractable?
+
+It is because there indeed are unknown parameters in the conditional distribution $p(\mathbf{x}_{t-1} | \mathbf{x}_t)$ as in Eq (3). 
+We do not know the mean $\mu_\theta$ and the variance $\Sigma_\theta$, and hence we <font color='red'>**CANNOT**</font> leverage the reparameterization trick to do the sampling iteratively:
+
+$$\mathbf{x}_{t-1} = \mu_{\theta} \mathbf{x}_{t} +  \sqrt{\Sigma_\theta} \mathbf{\epsilon_{t}}
+\tag{4}
+$$
+
+We CANNOT get $\mathbf{x}_{t-1}$ from $\mathbf{x}_{t}$ based on this unknown conditional probability and the **reparameterization trick** as in Eq (4).
+
+
+Another way to interporate this "intractability" is from Bayes' theorem. 
+
+- If we can reverse the above process and sample from $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$, we will be able to recreate the true sample from a Gaussian noise input, $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$. Note that if $\beta_t$ is small enough, $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ will also be Gaussian. <font color='red'> Unfortunately, we cannot easily estimate </font>  $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ because it needs to use <font color='red'> the entire dataset </font>. 
+- Recall Bayes’ rule:
+$$ 
+\begin{aligned}
+p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) 
+&=  \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ p(\mathbf{x}_t ) } \\
+
+& \xRightarrow[\text{}]{\text{w.r.t hiden var. } z}   \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t}, z \right) dz } =  \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t} \vert z \right) p\left( \mathbf {z} \right) dz }  \\
+
+& \xRightarrow[\text{}]{\text{Or w.r.t any prev. } x } \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{\mathbf{x}_{t-1}} p(\mathbf{x}_t \vert \mathbf{x}_{t-1}) p(\mathbf{x}_{t-1}) d\mathbf{x}_{t-1} }  \\
+
+\end{aligned} \tag{5}
+$$
+
+- Therefore, the reverse conditional probability $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) $ as shown in Eq (3) and (5), is intractable because **<font color='red'> the integration </font>** is performed over the whole latent $z$ (or equivalently the previous samples $\mathbf{x}_{t-1}$) space, which is impractical when latent variables are continuous.
+
+- It is intractable, but should we do nothing? No! As we know that neural networks are universal function approximators that can approximate any functions to arbitrary precisions. Therefore, we could use a neural network with parameters $\theta$ to approximate the distribution $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) $, which gives us $p_{\theta}(\mathbf{x}_{t-1} \vert \mathbf{x}_t) $.
+
 ## Defining an objective function (by reparametrizing the mean)
 
-To derive an objective function to learn the mean of the backward process, the authors observe that the combination of $q$ and $p_\theta$ can be seen as a variational auto-encoder (VAE) [(Kingma et al., 2013)](https://arxiv.org/abs/1312.6114). Hence, the **variational lower bound** (also called ELBO) can be used to minimize the negative log-likelihood with respect to ground truth data sample $\mathbf{x}_0$ (we refer to the VAE paper for details regarding ELBO). It turns out that the ELBO for this process is a sum of losses at each time step $t$, $L = L_0 + L_1 + ... + L_T$. By construction of the forward $q$ process and backward process, each term (except for $L_0$) of the loss is actually the **KL divergence between 2 Gaussian distributions** which can be written explicitly as an L2-loss with respect to the means!
+To derive an objective function to learn the mean of the backward process, the authors observe that the combination of $q$ and $p_\theta$ can be seen as a variational auto-encoder (VAE) [(Kingma et al., 2013)](https://arxiv.org/abs/1312.6114). Hence, the **variational lower bound** (also called **ELBO (Evidence Lower Bound)**) can be used to minimize the negative log-likelihood with respect to  ground truth data sample $\mathbf{x}_0$ (we refer to the VAE paper for details regarding ELBO). It turns out that the ELBO for this process is a sum of losses at each time step $t$, 
 
-A direct consequence of the constructed forward process $q$, as shown by Sohl-Dickstein et al., is that we can sample $\mathbf{x}_t$ at any arbitrary noise level conditioned on $\mathbf{x}_0$ (since sums of Gaussians is also Gaussian). This is very convenient:  we don't need to apply $q$ repeatedly in order to sample $\mathbf{x}_t$. 
-We have that 
-$$q(\mathbf{x}_t | \mathbf{x}_0) = \cal{N}(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1- \bar{\alpha}_t) \mathbf{I})$$
+$$L = L_0 + L_1 + ... + L_T
+\tag{6}
+$$. 
 
-with $\alpha_t := 1 - \beta_t$ and $\bar{\alpha}_t := \Pi_{s=1}^{t} \alpha_s$. Let's refer to this equation as the "nice property". This means we can sample Gaussian noise and scale it appropriatly and add it to $\mathbf{x}_0$ to get $\mathbf{x}_t$ directly. Note that the $\bar{\alpha}_t$ are functions of the known $\beta_t$ variance schedule and thus are also known and can be precomputed. This then allows us, during training, to **optimize random terms of the loss function $L$** (or in other words, to randomly sample $t$ during training and optimize $L_t$).
+By construction of the forward $q$ process and backward process, each term (except for $L_0$) of the loss is actually the **KL divergence between 2 Gaussian distributions** which can be written explicitly as an L2-loss with respect to the means!
 
-Another beauty of this property, as shown in Ho et al. is that one can (after some math, for which we refer the reader to [this excellent blog post](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/)) instead **reparametrize the mean to make the neural network learn (predict) the added noise (via a network $\mathbf{\epsilon}_\theta(\mathbf{x}_t, t)$) for noise level $t$** in the KL terms which constitute the losses. This means that our neural network becomes a noise predictor, rather than a (direct) mean predictor. The mean can be computed as follows:
+A direct consequence of the constructed forward process $q$, as shown by Sohl-Dickstein et al., is that we can sample $\mathbf{x}_t$ at any arbitrary noise level conditioned on $\mathbf{x}_0$ (<font color='red'> since sums of Gaussians is also Gaussian </font>). This is very convenient:  we don't need to apply $q$ repeatedly in order to sample $\mathbf{x}_t$.
 
-$$ \mathbf{\mu}_\theta(\mathbf{x}_t, t) = \frac{1}{\sqrt{\alpha_t}} \left(  \mathbf{x}_t - \frac{\beta_t}{\sqrt{1- \bar{\alpha}_t}} \mathbf{\epsilon}_\theta(\mathbf{x}_t, t) \right)$$
+We have that
+$$
+\begin{aligned}
+\text{nice property} \quad q(\mathbf{x}_t | \mathbf{x}_0) &= \cal{N}(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1- \bar{\alpha}_t) \mathbf{I}) \\ 
+\text{ with } \alpha_t &:= 1 - \beta_t \text{ and } \\
+\bar{\alpha}_t &:= \Pi_{s=1}^{t} \alpha_s
+\end{aligned}
+\tag{7}
+$$.
+
+- Let's refer to this equation (7) as the "nice property". This means we can sample Gaussian noise and scale it appropriatly and add it to $\mathbf{x}_0$ to get $\mathbf{x}_t$ directly. Note that the $\bar{\alpha}_t$ are functions of the known $\beta_t$ `variance schedule` and thus are also known and can be precomputed. This then allows us, during training, to **optimize random terms of the loss function $L$** (or in other words, to randomly sample $t$ during training and optimize $L_t$).
+
+- Another beauty of this property, as shown in Ho et al. is that one can (after some math, for which we refer the reader to [this excellent blog post: What are Diffusion Models?](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/)) instead **reparametrize the mean to make the neural network learn (predict) the added noise (via a network $\mathbf{\epsilon}_\theta(\mathbf{x}_t, t)$) for noise level $t$** in the KL terms which constitute the losses. This means that our neural network becomes a  **<font color='red'> noise predictor </font>**, rather than a (direct) mean predictor. The mean can be computed as follows:
+
+$$
+\begin{aligned}
+\boldsymbol{\mu}_\theta(\mathbf{x}_t, t) &= \color{cyan}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \Big)} \\
+\text{Thus } \mathbf{x}_{t-1} \sim p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) &= \mathcal{N}(\mathbf{x}_{t-1}; \frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \Big), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t))
+\end{aligned}
+$$
+
 
 The final objective function $L_t$ then looks as follows (for a random time step $t$ given $\mathbf{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ ): 
 
