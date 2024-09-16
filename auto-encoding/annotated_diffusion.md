@@ -48,18 +48,19 @@ In a bit more detail for images, the set-up consists of 2 processes:
     <img src="images/78_annotated-diffusion/diffusion_figure.png" width="600" />
 </p>
 
-Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $T$ (the DDPM authors use $T=1000$). You start with $t=0$ where you sample a real image $\mathbf{x}_0$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $t=T$ via a gradual process.
+Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $`T`$ (the DDPM authors use $`T=1000`$). You start with $t=0$ where you sample a real image $`\mathbf{x}_0`$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $`t=T`$ via a gradual process.
 
 ## In more mathematical form
 
 Let's write this down more formally, as ultimately we need a tractable loss function which our neural network needs to optimize. 
 
 ### Forward diffusion process $q$
-Let $q(\mathbf{x}_0)$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $\mathbf{x}_0 \sim q(\mathbf{x}_0)$. We define the forward diffusion process $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $0 < \beta_1 < \beta_2 < ... < \beta_T < 1$ as
-$$
+Let $`q(\mathbf{x}_0)`$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $`\mathbf{x}_0 \sim q(\mathbf{x}_0)`$. We define the forward diffusion process $`q(\mathbf{x}_t | \mathbf{x}_{t-1})`$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $`0 < \beta_1 < \beta_2 < ... < \beta_T < 1`$ as
+
+$$`
 q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
 \tag{1}
-$$
+`$$
 
 Recall that a normal distribution (also called Gaussian distribution) is defined by 2 parameters: a mean $\mu$ and a variance $\sigma^2 \geq 0$. 
 
