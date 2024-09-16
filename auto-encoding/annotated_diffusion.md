@@ -57,10 +57,8 @@ Let's write this down more formally, as ultimately we need a tractable loss func
 ### Forward diffusion process $q$
 Let $`q(\mathbf{x}_0)`$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $`\mathbf{x}_0 \sim q(\mathbf{x}_0)`$. We define the forward diffusion process $`q(\mathbf{x}_t | \mathbf{x}_{t-1})`$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $`0 < \beta_1 < \beta_2 < ... < \beta_T < 1`$ as
 
-```math
-q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
-\tag{1}
-```
+$$ q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
+\tag{1} $$
 
 Recall that a normal distribution (also called Gaussian distribution) is defined by 2 parameters: a mean $\mu$ and a variance $\sigma^2 \geq 0$. 
 
