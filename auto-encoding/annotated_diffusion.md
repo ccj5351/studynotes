@@ -8,20 +8,13 @@ This is my study note of the blog
  
 In this blog post, we'll take a deeper look into **Denoising Diffusion Probabilistic Models** (also known as DDPMs, diffusion models, score-based generative models or simply [autoencoders](https://benanne.github.io/2022/01/31/diffusion.html)) as researchers have been able to achieve remarkable results with them for (un)conditional image/audio/video generation. Popular examples (at the time of writing) include [GLIDE](https://arxiv.org/abs/2112.10741) and [DALL-E 2](https://openai.com/dall-e-2/) by OpenAI, [Latent Diffusion](https://github.com/CompVis/latent-diffusion) by the University of Heidelberg and [ImageGen](https://imagen.research.google/) by Google Brain.
 
+
 We'll go over the original DDPM paper by ([Ho et al., 2020](https://arxiv.org/abs/2006.11239)), implementing it step-by-step in PyTorch, based on Phil Wang's [implementation](https://github.com/lucidrains/denoising-diffusion-pytorch) - which itself is based on the [original TensorFlow implementation](https://github.com/hojonathanho/diffusion). Note that the idea of diffusion for generative modeling was actually already introduced in ([Sohl-Dickstein et al., 2015](https://arxiv.org/abs/1503.03585)). However, it took until ([Song et al., 2019](https://arxiv.org/abs/1907.05600)) (at Stanford University), and then ([Ho et al., 2020](https://arxiv.org/abs/2006.11239)) (at Google Brain) who independently improved the approach.
 
 Note that there are [several perspectives](https://twitter.com/sedielem/status/1530894256168222722?s=20&t=mfv4afx1GcNQU5fZklpACw) on diffusion models. Here, we employ the discrete-time (latent variable model) perspective, but be sure to check out the other perspectives as well.
 
 Alright, let's dive in!
 
-```python
-from IPython.display import Image
-Image(filename='assets/78_annotated-diffusion/ddpm_paper.png')
-```
-
-<p align="center">
-    <img src="assets/78_annotated-diffusion/ddpm_paper.png" width="300" />
-</p>
 
 We'll install and import the required libraries first (assuming you have [PyTorch](https://pytorch.org/) installed).
 
@@ -52,7 +45,7 @@ In a bit more detail for images, the set-up consists of 2 processes:
 * a `learned` reverse denoising diffusion process $p_\theta$, where a neural network is trained to gradually denoise an image starting from pure noise, until you end up with an actual image.
 
 <p align="center">
-    <img src="assets/78_annotated-diffusion/diffusion_figure.png" width="600" />
+    <img src="images/78_annotated-diffusion/diffusion_figure.png" width="600" />
 </p>
 
 Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $T$ (the DDPM authors use $T=1000$). You start with $t=0$ where you sample a real image $\mathbf{x}_0$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $t=T$ via a gradual process.
@@ -443,6 +436,15 @@ class LinearAttention(nn.Module):
         return self.to_out(out)
 ```
 
+But I like this figure which compares regular attention vs linear attention. This figure is copied from the paper [Efficient Attention: Attention with Linear Complexities](https://arxiv.org/pdf/1812.01243) or the github repo [Linear Attention Transformer](https://github.com/lucidrains/linear-attention-transformer).
+
+<p align="center">
+    <img src="images/78_annotated-diffusion/linear-attention.png" width="700" />
+</p>
+
+See my study notes about [attention and linear attention](attention-and-linear-attention.md).
+
+
 ### Group normalization
 
 The DDPM authors interleave the convolutional/attention layers of the U-Net with group normalization ([Wu et al., 2018](https://arxiv.org/abs/1803.08494)). Below, we define a `PreNorm` class, which will be used to apply groupnorm before the attention layer, as we'll see further. Note that there's been a [debate](https://tnq177.github.io/data/transformers_without_tears.pdf) about whether to apply normalization before or after attention in Transformers.
@@ -461,18 +463,20 @@ class PreNorm(nn.Module):
 
 ### Conditional U-Net
 
-Now that we've defined all building blocks (position embeddings, ResNet blocks, attention and group normalization), it's time to define the entire neural network. Recall that the job of the network $\mathbf{\epsilon}_\theta(\mathbf{x}_t, t)$ is to take in a batch of noisy images and their respective noise levels, and output the noise added to the input. More formally:
+Now that we've defined all building blocks (position embeddings, ResNet blocks, attention and group normalization), it's time to define the entire neural network. 
+
+Recall that the job of the network $\mathbf{\epsilon}_\theta(\mathbf{x}_t, t)$ is to take in a batch of noisy images and their respective noise levels, and output the noise added to the input. More formally:
 
 - the network takes a batch of noisy images of shape `(batch_size, num_channels, height, width)` and a batch of noise levels of shape `(batch_size, 1)` as input, and returns a tensor of shape `(batch_size, num_channels, height, width)`
 
 The network is built up as follows:
-* first, a convolutional layer is applied on the batch of noisy images, and position embeddings are computed for the noise levels
-* next, a sequence of downsampling stages are applied. Each downsampling stage consists of 2 ResNet blocks + groupnorm + attention + residual connection + a downsample operation
-* at the middle of the network, again ResNet blocks are applied, interleaved with attention
-* next, a sequence of upsampling stages are applied. Each upsampling stage consists of 2 ResNet  blocks + groupnorm + attention + residual connection + an upsample operation
+* first, a convolutional layer is applied on the batch of noisy images, and position embeddings are computed for the noise levels;
+* next, a sequence of downsampling stages are applied. Each downsampling stage consists of 2 ResNet blocks + groupnorm + attention + residual connection + a downsample operation;
+* at the middle of the network, again ResNet blocks are applied, interleaved with attention;
+* next, a sequence of upsampling stages are applied. Each upsampling stage consists of 2 ResNet  blocks + groupnorm + attention + residual connection + an upsample operation;
 * finally, a ResNet block followed by a convolutional layer is applied.
 
-Ultimately, neural networks stack up layers as if they were lego blocks (but it's important to [understand how they work](http://karpathy.github.io/2019/04/25/recipe/)).
+Ultimately, neural networks stack up layers as if they were lego blocks (but it's important to understand how they work as illustratated in this blog [A Recipe for Training Neural Networks](http://karpathy.github.io/2019/04/25/recipe/)) by Andrej Karpathy.
 
 
 ```python
@@ -679,7 +683,10 @@ url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
 image = Image.open(requests.get(url, stream=True).raw) # PIL image of shape HWC
 image
 ```
-<img src="assets/78_annotated-diffusion/output_cats.jpeg" width="400" />
+<p align="center">
+<img src="images/78_annotated-diffusion/output_cats.jpeg" width="400" />
+</p>
+
 
 Noise is added to PyTorch tensors, rather than Pillow Images. We'll first define image transformations that allow us to go from a PIL image to a PyTorch tensor (on which we can add the noise), and vice versa.
 
@@ -734,8 +741,9 @@ Let's verify this:
 reverse_transform(x_start.squeeze())
 ```
     
-<img src="assets/78_annotated-diffusion/output_cats_verify.png" width="100" />
-
+<p align="center">
+<img src="images/78_annotated-diffusion/output_cats_verify.png" width="100" />
+</p>
 We can now define the forward diffusion process as in the paper:
 
 
@@ -773,7 +781,9 @@ t = torch.tensor([40])
 get_noisy_image(x_start, t)
 ```
 
-<img src="assets/78_annotated-diffusion/output_cats_noisy.png" width="100" />
+<p align="center">
+<img src="images/78_annotated-diffusion/output_cats_noisy.png" width="100" />
+</p>
 
 Let's visualize this for various time steps:
 
@@ -812,8 +822,10 @@ def plot(imgs, with_orig=False, row_title=None, **imshow_kwargs):
 ```python
 plot([get_noisy_image(x_start, torch.tensor([t])) for t in [0, 50, 100, 150, 199]])
 ```
-  
-<img src="assets/78_annotated-diffusion/output_cats_noisy_multiple.png" width="800" />
+
+<p align="center">
+<img src="images/78_annotated-diffusion/output_cats_noisy_multiple.png" width="800" />
+</p>
     
 This means that we can now define the loss function given the model as follows:
 
@@ -903,7 +915,10 @@ print(batch.keys())
 
 As we'll sample from the model during training (in order to track progress), we define the code for that below. Sampling is summarized in the paper as Algorithm 2:
 
-<img src="assets/78_annotated-diffusion/sampling.png" width="500" />
+
+<p align="center">
+<img src="images/78_annotated-diffusion/sampling.png" width="500" />
+</p>
 
 Generating new images from a diffusion model happens by reversing the diffusion process: we start from $T$, where we sample pure noise from a Gaussian distribution, and then use our neural network to gradually denoise it (using the conditional probability it has learned), until we end up at time step $t = 0$. As shown above, we can derive a slighly less denoised image $\mathbf{x}_{t-1 }$ by plugging in the reparametrization of the mean, using our noise predictor. Remember that the variance is known ahead of time.
 
@@ -1076,7 +1091,9 @@ random_index = 5
 plt.imshow(samples[-1][random_index].reshape(image_size, image_size, channels), cmap="gray")
 ```
 
-<img src="assets/78_annotated-diffusion/output.png" width="300" />
+<p align="center">
+<img src="images/78_annotated-diffusion/output.png" width="300" >
+</p>
 
 Seems like the model is capable of generating a nice T-shirt! Keep in mind that the dataset we trained on is pretty low-resolution (28x28).
 
@@ -1098,8 +1115,10 @@ animate.save('diffusion.gif')
 plt.show()
 ```
 
-<img src="
-assets/78_annotated-diffusion/diffusion-sweater.gif" width="300" />
+
+<p align="center">
+<img src="images/78_annotated-diffusion/diffusion-sweater.gif" width="300" />
+</p>
 
 ## Follow-up reads
 
