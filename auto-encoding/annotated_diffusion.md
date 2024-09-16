@@ -44,9 +44,9 @@ In a bit more detail for images, the set-up consists of 2 processes:
 * a fixed (or predefined) forward diffusion process $q$ of our choosing, that gradually adds Gaussian noise to an image, until you end up with pure noise
 * a `learned` reverse denoising diffusion process $p_\theta$, where a neural network is trained to gradually denoise an image starting from pure noise, until you end up with an actual image.
 
-<p align="center">
+<div align="center">
     <img src="images/78_annotated-diffusion/diffusion_figure.png" width="600" />
-</p>
+</div>
 
 Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $`T`$ (the DDPM authors use $`T=1000`$). You start with $t=0$ where you sample a real image $`\mathbf{x}_0`$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $`t=T`$ via a gradual process.
 
@@ -58,7 +58,8 @@ Let's write this down more formally, as ultimately we need a tractable loss func
 Let $`q(\mathbf{x}_0)`$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $`\mathbf{x}_0 \sim q(\mathbf{x}_0)`$. We define the forward diffusion process $`q(\mathbf{x}_t | \mathbf{x}_{t-1})`$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $`0 < \beta_1 < \beta_2 < ... < \beta_T < 1`$ as
 
 $$
-q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I})
+q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
+\tag{1}
 $$
 
 Recall that a normal distribution (also called Gaussian distribution) is defined by 2 parameters: a mean $\mu$ and a variance $\sigma^2 \geq 0$. 
@@ -130,6 +131,7 @@ Another way to interporate this "intractability" is from Bayes' theorem.
 
 - If we can reverse the above process and sample from $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$, we will be able to recreate the true sample from a Gaussian noise input, $\mathbf{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$. Note that if $\beta_t$ is small enough, $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ will also be Gaussian. <font color='red'> Unfortunately, we cannot easily estimate </font>  $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ because it needs to use <font color='red'> the entire dataset </font>. 
 - Recall Bayes’ rule:
+
 $$ 
 \begin{aligned}
 p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) 
@@ -138,8 +140,8 @@ p(\mathbf{x}_{t-1} \vert \mathbf{x}_t)
 & \xRightarrow[\text{}]{\text{w.r.t hiden var. } z}   \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t}, z \right) dz } =  \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t} \vert z \right) p\left( \mathbf {z} \right) dz }  \\
 
 & \xRightarrow[\text{}]{\text{Or w.r.t any prev. } x } \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{\mathbf{x}_{t-1}} p(\mathbf{x}_t \vert \mathbf{x}_{t-1}) p(\mathbf{x}_{t-1}) d\mathbf{x}_{t-1} }  \\
-
-\end{aligned} \tag{5}
+\end{aligned}
+\tag{5}
 $$
 
 - Therefore, the reverse conditional probability $p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) $ as shown in Eq (3) and (5), is intractable because **<font color='red'> the integration </font>** is performed over the whole latent $z$ (or equivalently the previous samples $\mathbf{x}_{t-1}$) space, which is impractical when latent variables are continuous.
@@ -198,9 +200,9 @@ Here, $\mathbf{x}_0$ is the initial (real, uncorrupted) image, and we see the di
 
 The training algorithm now looks as follows:
 
-<p align="center">
+<div align="center">
     <img src="images/78_annotated-diffusion/training.png" width="400" />
-</p>
+</div>
 
 
 In other words:
@@ -219,9 +221,9 @@ What is typically used here is very similar to that of an [Autoencoder](https://
 
 In terms of architecture, the DDPM authors went for a **U-Net**, introduced by ([Ronneberger et al., 2015](https://arxiv.org/abs/1505.04597)) (which, at the time, achieved state-of-the-art results for medical image segmentation). This network, like any autoencoder, consists of a bottleneck in the middle that makes sure the network learns only the most important information. Importantly, it introduced residual connections between the encoder and decoder, greatly improving gradient flow (inspired by ResNet in [He et al., 2015](https://arxiv.org/abs/1512.03385)).
 
-<p align="center">
+<div align="center">
     <img src="images/78_annotated-diffusion/unet_architecture.jpg" width="600" />
-</p>
+</div>
 
 As can be seen, a U-Net model first downsamples the input (i.e. makes the input smaller in terms of spatial resolution), after which upsampling is performed.
 
@@ -438,9 +440,9 @@ class LinearAttention(nn.Module):
 
 But I like this figure which compares regular attention vs linear attention. This figure is copied from the paper [Efficient Attention: Attention with Linear Complexities](https://arxiv.org/pdf/1812.01243) or the github repo [Linear Attention Transformer](https://github.com/lucidrains/linear-attention-transformer).
 
-<p align="center">
+<div align="center">
     <img src="images/78_annotated-diffusion/linear-attention.png" width="700" />
-</p>
+</div>
 
 See my study notes about [attention and linear attention](attention-and-linear-attention.md).
 
@@ -683,9 +685,9 @@ url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
 image = Image.open(requests.get(url, stream=True).raw) # PIL image of shape HWC
 image
 ```
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/output_cats.jpeg" width="400" />
-</p>
+</div>
 
 
 Noise is added to PyTorch tensors, rather than Pillow Images. We'll first define image transformations that allow us to go from a PIL image to a PyTorch tensor (on which we can add the noise), and vice versa.
@@ -741,9 +743,9 @@ Let's verify this:
 reverse_transform(x_start.squeeze())
 ```
     
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/output_cats_verify.png" width="100" />
-</p>
+</div>
 We can now define the forward diffusion process as in the paper:
 
 
@@ -781,9 +783,9 @@ t = torch.tensor([40])
 get_noisy_image(x_start, t)
 ```
 
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/output_cats_noisy.png" width="100" />
-</p>
+</div>
 
 Let's visualize this for various time steps:
 
@@ -823,9 +825,9 @@ def plot(imgs, with_orig=False, row_title=None, **imshow_kwargs):
 plot([get_noisy_image(x_start, torch.tensor([t])) for t in [0, 50, 100, 150, 199]])
 ```
 
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/output_cats_noisy_multiple.png" width="800" />
-</p>
+</div>
     
 This means that we can now define the loss function given the model as follows:
 
@@ -916,9 +918,9 @@ print(batch.keys())
 As we'll sample from the model during training (in order to track progress), we define the code for that below. Sampling is summarized in the paper as Algorithm 2:
 
 
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/sampling.png" width="500" />
-</p>
+</div>
 
 Generating new images from a diffusion model happens by reversing the diffusion process: we start from $T$, where we sample pure noise from a Gaussian distribution, and then use our neural network to gradually denoise it (using the conditional probability it has learned), until we end up at time step $t = 0$. As shown above, we can derive a slighly less denoised image $\mathbf{x}_{t-1 }$ by plugging in the reparametrization of the mean, using our noise predictor. Remember that the variance is known ahead of time.
 
@@ -1091,9 +1093,9 @@ random_index = 5
 plt.imshow(samples[-1][random_index].reshape(image_size, image_size, channels), cmap="gray")
 ```
 
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/output.png" width="300" >
-</p>
+</div>
 
 Seems like the model is capable of generating a nice T-shirt! Keep in mind that the dataset we trained on is pretty low-resolution (28x28).
 
@@ -1116,9 +1118,9 @@ plt.show()
 ```
 
 
-<p align="center">
+<div align="center">
 <img src="images/78_annotated-diffusion/diffusion-sweater.gif" width="300" />
-</p>
+</div>
 
 ## Follow-up reads
 
