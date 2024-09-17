@@ -1,6 +1,7 @@
 import math
 from inspect import isfunction
 from functools import partial
+import sys
 
 import matplotlib.pyplot as plt
 from tqdm.auto import tqdm
@@ -9,12 +10,23 @@ from einops.layers.torch import Rearrange
 
 import torch
 from torch import nn, einsum
+from torch.optim import Adam
 import torch.nn.functional as F
 
 from torchvision.transforms import (
     Compose, ToTensor, Lambda, 
     ToPILImage, CenterCrop, Resize
 )
+from torchvision.utils import save_image
+
+# install hugging face `datasets``
+from datasets import load_dataset
+from torchvision import transforms
+from torch.utils.data import DataLoader
+
+from pathlib import Path
+import matplotlib.animation as animation
+
 
 # Network helpers
 def exists(x):
@@ -374,7 +386,8 @@ def run_main(timesteps = 300):
     torch.manual_seed(0)
     
     # define beta schedule
-    betas = linear_beta_schedule(timesteps=timesteps)
+    betas = linear_beta_schedule(timesteps=timesteps) #[T,]
+    print (f"betas = {betas.shape}" )
     
     # define alphas 
     alphas = 1. - betas
@@ -392,7 +405,10 @@ def run_main(timesteps = 300):
     def extract(a, t, x_shape):
         batch_size = t.shape[0]
         out = a.gather(dim=-1, index=t.cpu())
-        return out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
+        #print (f"extract: out = {out.shape}")
+        out = out.reshape(batch_size, *((1,) * (len(x_shape) - 1))).to(t.device)
+        #print (f"reshaped to out = {out.shape}")
+        return out
     
 
 
@@ -434,7 +450,7 @@ def run_main(timesteps = 300):
     # Let's visualize this for various time steps:
     import matplotlib.pyplot as plt
     # source: https://pytorch.org/vision/stable/auto_examples/plot_transforms.html#sphx-glr-auto-examples-plot-transforms-py
-    def plot(imgs, with_orig=False, orig_image = None, row_title=None, **imshow_kwargs):
+    def plot(imgs, with_orig=False, orig_image = None, row_title=None, col_title=None, **imshow_kwargs):
         if not isinstance(imgs[0], list):
             # Make a 2d grid even if there's just 1 row
             imgs = [imgs]
@@ -449,16 +465,25 @@ def run_main(timesteps = 300):
                 ax.imshow(np.asarray(img), **imshow_kwargs)
                 ax.set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
 
+        col_start_idx = 0
         if with_orig:
             axs[0, 0].set(title='Original image')
             axs[0, 0].title.set_size(8)
+            col_start_idx += 1
+        
+        if col_title is not None:
+            for col_idx in range(len(col_title)):
+                axs[0, col_start_idx+col_idx].set(title=col_title[col_idx])
+            
         if row_title is not None:
             for row_idx in range(num_rows):
                 axs[row_idx, 0].set(ylabel=row_title[row_idx])
 
         plt.tight_layout()
+        plt.show()
+        
     
-    if 1:
+    if 0:
         url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
         image = Image.open(requests.get(url, stream=True).raw) # PIL image of shape HWC
         image_size = 128
@@ -474,14 +499,16 @@ def run_main(timesteps = 300):
         print ("x_start shape = ", x_start.shape) 
         
         # take time steps
-        # take time step
-        t_steps = [0, 50, 100, 150, 199]
+        t_steps = [0, 50, 100, 150, 200, timesteps-1]
         t_steps = [torch.tensor([t]) for t in t_steps]
         # Let's visualize this for various time steps:
         plot(
             imgs = [get_noisy_image(x_start, torch.tensor([t])) for t in t_steps],
-            with_orig= True, 
+            with_orig= False, 
+            col_title= [f'step t={t.item()}/{timesteps}' for t in t_steps],
             orig_image= image)
+        #sys.exit()
+        
     
     # The denoise_model will be our U-Net defined above. 
     # We'll employ the Huber loss between the true and the predicted noise.
@@ -517,12 +544,12 @@ def run_main(timesteps = 300):
     ])
 
     # define function
-    def transforms(examples):
+    def transforms_func(examples):
         examples["pixel_values"] = [transform(image.convert("L")) for image in examples["image"]]
         del examples["image"]
         return examples
 
-    transformed_dataset = dataset.with_transform(transforms).remove_columns("label")
+    transformed_dataset = dataset.with_transform(transforms_func).remove_columns("label")
 
     # create dataloader
     dataloader = DataLoader(transformed_dataset["train"], 
@@ -564,16 +591,27 @@ def run_main(timesteps = 300):
         imgs = []
 
         for i in tqdm(reversed(range(0, timesteps)), desc='sampling loop time step', total=timesteps):
+            # torch.full(size, fill_value):
+            #  to create a tensor of size `size` filled with `fill_value`. 
+            #  The tensor’s dtype is inferred from `fill_value`.
             img = p_sample(model, img, torch.full((b,), i, device=device, dtype=torch.long), i)
-            imgs.append(img.cpu().numpy())
+            #imgs.append(img.cpu().numpy())
+            imgs.append(img)
+        print (f"image shape = {img.shape}, imgs# = {len(imgs)}")
         return imgs
 
     @torch.no_grad()
+    def sample_np(model, image_size, batch_size=16, channels=3):
+        imgs = p_sample_loop(model, shape=(batch_size, channels, image_size, image_size))
+        imgs = [img.cpu().numpy() for img in imgs]
+        return imgs
+    
+    @torch.no_grad()
     def sample(model, image_size, batch_size=16, channels=3):
-        return p_sample_loop(model, shape=(batch_size, channels, image_size, image_size))
+        imgs = p_sample_loop(model, shape=(batch_size, channels, image_size, image_size))
+        return imgs
 
-    # Train the model
-    from pathlib import Path
+
     
     def num_to_groups(num, divisor):
         groups = num // divisor
@@ -586,16 +624,89 @@ def run_main(timesteps = 300):
     results_folder = Path("./results")
     results_folder.mkdir(exist_ok = True)
     save_and_sample_every = 1000
+    #save_and_sample_every = 100
 
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    model = Unet(
+        dim=image_size,
+        channels=channels,
+        dim_mults=(1, 2, 4,)
+    )
+    model.to(device)
+
+    # Train the model
+    optimizer = Adam(model.parameters(), lr=1e-3) 
+    epochs = 20
+    print (f"dataloader len = {len(dataloader)}")
+    for epoch in range(epochs):
+        data_len = len(dataloader)
+        for step, batch in enumerate(dataloader):
+            optimizer.zero_grad()
+            global_step = step + epoch*data_len
+            batch_size = batch["pixel_values"].shape[0]
+            batch = batch["pixel_values"].to(device)
+
+            # Algorithm 1 line 3: sample t uniformly for every example in the batch
+            t = torch.randint(0, timesteps, (batch_size,), device=device).long()
+
+            loss = p_losses(model, batch, t, loss_type="huber")
+
+            if step % 100 == 0:
+                print("Loss:", loss.item())
+
+            loss.backward()
+            optimizer.step()
+
+            # save generated images
+            if global_step != 0 and global_step % save_and_sample_every == 0:
+                milestone = global_step // save_and_sample_every
+                batches = num_to_groups(4, batch_size)
+                print ("batches = ", batches) # different batch sizes;
+                # list of list of tensors, each tensor in size [B, C, H, W];
+                all_images_list = list(map(lambda n: sample(model, image_size, batch_size=n, channels=channels), batches))
+                print ("all_images_list = ", len(all_images_list), all_images_list[0][0].shape)
+                all_images = torch.stack(all_images_list[0], dim=0) #[T, B, C, H, W]
+                random_index = np.random.randint(0, all_images.size(1))
+                print ("random_index = ", random_index)
+                all_images = all_images[:,random_index,...] #[N*T,C,H,W]
+                all_images = (all_images + 1) * 0.5
+                img_path = str(results_folder / f'sample-{milestone}.png')
+                save_image(all_images, img_path, nrow = 6)
+                print (f"saved images at {img_path}")
+    
+    # sample 64 images
+    samples = sample_np(model, image_size=image_size, batch_size=64, channels=channels)
+    # show a random one
+    random_index = 5
+    plt.imshow(samples[-1][random_index].reshape(image_size, image_size, channels), cmap="gray")
+
+    # We can also create a gif of the denoising process:
+    random_index = 53
+    fig = plt.figure()
+    ims = []
+    for i in range(timesteps):
+        im = plt.imshow(
+            samples[i][random_index].reshape(image_size, image_size, channels), cmap="gray", 
+            animated=True)
+        #ims.append([im])
+        # Set the title and add it to the animated frame
+        title = plt.text(0.5, 1.01, f"step t={i} / {timesteps}", size=plt.rcParams["axes.titlesize"],
+                     ha="center", transform=im.axes.transAxes)
+        # Append both the image and the title to the ims list
+        ims.append([im, title])
+    
+    animate = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
+    animate.save( results_folder / 'diffusion.gif')
+    plt.show()
 
 if __name__ == "__main__":
     from PIL import Image
     import numpy as np
     import requests
 
-    from datasets import load_dataset
-    from torchvision import transforms
-    from torch.utils.data import DataLoader
+    run_main()
 
 
 

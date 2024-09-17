@@ -44,18 +44,21 @@ In a bit more detail for images, the set-up consists of 2 processes:
 * a fixed (or predefined) forward diffusion process $q$ of our choosing, that gradually adds Gaussian noise to an image, until you end up with pure noise
 * a `learned` reverse denoising diffusion process $p_\theta$, where a neural network is trained to gradually denoise an image starting from pure noise, until you end up with an actual image.
 
+
+
 <div align="center">
     <img src="images/78_annotated-diffusion/diffusion_figure.png" width="600" />
 </div>
 
-Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $`T`$ (the DDPM authors use $`T=1000`$). You start with $t=0$ where you sample a real image $`\mathbf{x}_0`$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $`t=T`$ via a gradual process.
 
-## In more mathematical form
+Both the forward and reverse process indexed by $t$ happen for some number of finite time steps $T$ (the DDPM authors use $T=1000$). You start with $t=0$ where you sample a real image $\mathbf{x}_0$ from your data distribution (let's say an image of a cat from ImageNet), and the forward process samples some noise from a Gaussian distribution at each time step $t$, which is added to the image of the previous time step. Given a sufficiently large $T$ and a well behaved schedule for adding noise at each time step, you end up with what is called an [isotropic Gaussian distribution](https://math.stackexchange.com/questions/1991961/gaussian-distribution-is-isotropic) at $t=T$ via a gradual process.
+
+## In More Mathematical Form
 
 Let's write this down more formally, as ultimately we need a tractable loss function which our neural network needs to optimize. 
 
 ### Forward diffusion process $q$
-Let $`q(\mathbf{x}_0)`$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $`\mathbf{x}_0 \sim q(\mathbf{x}_0)`$. We define the forward diffusion process $`q(\mathbf{x}_t | \mathbf{x}_{t-1})`$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $`0 < \beta_1 < \beta_2 < ... < \beta_T < 1`$ as
+Let $q(\mathbf{x}_0)$ be the real data distribution, say of "real images". We can sample from this distribution to get an image, $\mathbf{x}_0 \sim q(\mathbf{x}_0)$. We define the forward diffusion process $q(\mathbf{x}_t | \mathbf{x}_{t-1})$ which adds Gaussian noise at each time step $t$, according to a known variance schedule $0 < \beta_1 < \beta_2 < ... < \beta_T < 1$ as
 
 $$
 q(\mathbf{x}_t | \mathbf{x}_{t-1}) = \mathcal{N}(\mathbf{x}_t; \sqrt{1 - \beta_t} \mathbf{x}_{t-1}, \beta_t \mathbf{I}). 
@@ -136,9 +139,7 @@ $$
 \begin{aligned}
 p(\mathbf{x}_{t-1} \vert \mathbf{x}_t) 
 &=  \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ p(\mathbf{x}_t ) } \\
-
 & \xRightarrow[\text{}]{\text{w.r.t hiden var. } z}   \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t}, z \right) dz } =  \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{z} p\left( \mathbf {x_t} \vert z \right) p\left( \mathbf {z} \right) dz }  \\
-
 & \xRightarrow[\text{}]{\text{Or w.r.t any prev. } x } \frac{ p(\mathbf{x}_t \vert \mathbf{x}_{t-1})  p(\mathbf{x}_{t-1}) }{ \int_{\mathbf{x}_{t-1}} p(\mathbf{x}_t \vert \mathbf{x}_{t-1}) p(\mathbf{x}_{t-1}) d\mathbf{x}_{t-1} }  \\
 \end{aligned}
 \tag{5}
