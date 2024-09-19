@@ -496,8 +496,9 @@ $$
 where the small offset $s$ is to prevent $\beta_t$ from being too small when close to $t=0$.
 
 <div  align="center">
-<img src="images/2021-07-11-diffusion-models/diffusion-beta.png" style="width: 65%;" class="center" />
-<figcaption> Fig. 5. Comparison of linear and cosine-based scheduling of $\beta\_t$ during training. (Image source: <a href="https://arxiv.org/abs/2102.09672" target="_blank">Nichol & Dhariwal, 2021</a>)</figcaption>
+<img src="images/2021-07-11-diffusion-models/diffusion-beta.png" style="width: 65%;"/>
+<br>
+<em> Fig. 5. Comparison of linear and cosine-based scheduling of βt during training. (Image source: <a href="https://arxiv.org/abs/2102.09672" target="_blank">Nichol & Dhariwal, 2021</a>)</em>
 </div>
 
 ### Parameterization of reverse process variance $\boldsymbol{\Sigma}_\theta$ <a id="parameterization-of-reverse-process-variance-boldsymbolsigma_theta"></a>
