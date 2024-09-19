@@ -238,7 +238,7 @@ q(\mathbf{x}_t \vert \mathbf{x}_{t-1}) \\
 \tag{8.3}
 $$
 
-Using Bayes' rule, we have:
+Using Bayes' rule, we have the <font color=red>forward process posterior</font> as:
 
 $$
 \begin{aligned}
@@ -393,7 +393,7 @@ $$
 L_\text{VLB} &= L_T + L_{T-1} + \dots + L_0 \\
 \text{where }  
   \textcolor{green}{L_T} &= D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T)) \\
-  \textcolor{cyan}{L_t} &= D_\text{KL}(q(\mathbf{x}_t \vert \mathbf{x}_{t+1}, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_t \vert\mathbf{x}_{t+1})) \text{ for }1 \leq t \leq T-1 \\
+  \textcolor{cyan}{L_{t-1}} &= D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_{t}, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_{t})) \text{ for } 2 \leq t \leq T \\
   \textcolor{red}{L_0} &= - \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)
 \end{aligned}
 \tag {16}
@@ -404,7 +404,13 @@ Every KL term in $L_\text{VLB}$ (except for $L_0$) compares two Gaussian distrib
 ### Parameterization of $L_t$ for Training Loss <a id="parameterization-of-l_t-for-training-loss"></a>
 
 
-Recall that we need to learn a neural network to approximate the conditioned probability distributions in the reverse diffusion process, $p_\theta(\mathbf{x}_{t-1} \vert \mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \boldsymbol{\mu}_\theta(\mathbf{x}_t, t), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t))$. We would like to train $\boldsymbol{\mu}_\theta$ to predict (or mimic) $\tilde{\boldsymbol{\mu}}_t = \frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)$ as in Eq 12. Because $\mathbf{x}_t$ is available as input at training time, we can reparameterize the Gaussian noise term instead to make it predict $\boldsymbol{\epsilon}_t$ from the input $\mathbf{x}_t$ at time step $t$:
+Recall that we need to learn a neural network to approximate the conditioned probability distributions in the reverse diffusion process, $p_\theta(\mathbf{x}_{t-1} \vert \mathbf{x}_t) = \mathcal{N}(\mathbf{x}_{t-1}; \boldsymbol{\mu}_\theta(\mathbf{x}_t, t), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t))$. We would like to train $\boldsymbol{\mu}_\theta$ to predict (or mimic) $\tilde{\boldsymbol{\mu}}_t = \frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)$ as in Eq 12. 
+
+
+As expressed in [DDPM paper](https://arxiv.org/pdf/2006.11239) beneath its Equation 8, 
+> We see that the most straightforward parameterization of $\boldsymbol{\mu}_\theta$ is a model that predicts $\tilde{\boldsymbol{\mu}}_t$, the forward process posterior mean.
+
+Because $\mathbf{x}_t$ is available as input at training time, we can reparameterize the Gaussian noise term instead to make it predict $\boldsymbol{\epsilon}_t$ from the input $\mathbf{x}_t$ at time step $t$:
 
 $$
 \begin{aligned}
