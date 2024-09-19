@@ -326,16 +326,28 @@ $$
 \end{aligned}
 $$
 
-It is also straightforward to get the same result using `Jensen's inequality`. Say we want to minimize the cross entropy as the learning objective,
+It is also straightforward to get the same result using `Jensen's inequality`. 
 
+---
+`Recall`: [Jensen's inequality](./jensen_inequality.md)
+
+> If $g(x)$ is a `convex` function on $\mathbf{R}_X$, and $E[g(X)]$ and $g(E[X])$ are finite, then 
+$$E[g(X)] \geq g(E[X])$$
+> Similarly, if $g(x)$ is a `concave` function, then we have 
+$$E[g(X)] \leq g(E[X])$$
+---
+
+Say we want to minimize the cross entropy as the learning objective,
 $$
 \begin{aligned}
 L_\text{CE}
 &= - \mathbb{E}_{q(\mathbf{x}_0)} \log p_\theta(\mathbf{x}_0) \\
 &= - \mathbb{E}_{q(\mathbf{x}_0)} \log \Big( \int p_\theta(\mathbf{x}_{0:T}) d\mathbf{x}_{1:T} \Big) \\
 &= - \mathbb{E}_{q(\mathbf{x}_0)} \log \Big( \int q(\mathbf{x}_{1:T} \vert \mathbf{x}_0) \frac{p_\theta(\mathbf{x}_{0:T})}{  q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})  } d\mathbf{x}_{1:T} \Big) \\
-&= - \mathbb{E}_{q(\mathbf{x}_0)} \log \Big( \mathbb{E}_{q(\mathbf{x}_{1:T} \vert \mathbf{x}_0)} \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \Big) \\
-&\leq - \mathbb{E}_{q(\mathbf{x}_{0:T})} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
+&= - \mathbb{E}_{q(\mathbf{x}_0)} \underbrace{ \textcolor{cyan}{\log
+ \Big( \mathbb{E}_{q(\mathbf{x}_{1:T} \vert \mathbf{x}_0)} \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \Big)} }_{\textcolor{green}{\log(E(\mathbf{X})) \geq E[\log(\mathbf{X})] \quad \because \log(\cdot)\text{ is concave} }}  \\
+&\leq - \underbrace{\mathbb{E}_{q(\mathbf{x}_{0})}{\textcolor{cyan}{\mathbb{E}_{q(\mathbf{x}_{1:T}  \vert \mathbf{x}_{0})}}} }_{\text{merge to } \mathbf{x}_{0:T}} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
+&= - \mathbb{E}_{q(\mathbf{x}_{0:T})} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})}\Big[\log \frac{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})}{p_\theta(\mathbf{x}_{0:T})} \Big] = L_\text{VLB}
 \tag{14}
 \end{aligned}
@@ -350,10 +362,29 @@ L_\text{VLB}
 (&\Rightarrow  \text{ to consider the forward diffusion process and reverse diffusion process })  \\ 
 &= \mathbb{E}_q \Big[ \log\frac{ \overbrace{\prod_{t=1}^T q(\mathbf{x}_t\vert\mathbf{x}_{t-1}) }^{\text{forward diffusion process, see Eq (1)}}}{ \underbrace{p_\theta(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t) } _{\text{reverse diffusion process, see Eq 6}} } \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=1}^T \log \frac{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} \Big] \\
-&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
-&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \Big( \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}\cdot \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1}\vert\mathbf{x}_0)} \Big) + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
-&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \underbrace{\textcolor{cyan}{\sum_{t=2}^T \log \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)} }}_{\text{telescoping sum 裂项相消}} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
-&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \textcolor{cyan}{\log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{q(\mathbf{x}_1 \vert \mathbf{x}_0)}} + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big]\\
+&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{\textcolor{cyan}{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}}{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}} +  \underbrace{\log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{t=1}} \Big] \\
+
+\Big(  & \text{see Eq 8.3, forward process }    q(\mathbf{x}_t \vert \mathbf{x}_{t-1})
+    \xRightarrow[\text{}]{ \mathbf{x}_{t} \text { and } \mathbf{x}_{t-1} \text{ are indep. to } \mathbf{x}_{0}}  q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_{0})  \Big) \\
+
+
+&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{\textcolor{cyan}{q(\mathbf{x}_t\vert\mathbf{x}_{t-1},\mathbf{x}_0)}}  { 
+  \textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}
+}
+ +  \underbrace{\log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{t=1}} \Big] \\
+
+\Big( &\text{Baye's Theorem, forward process }  q(\mathbf{x}_{t} \vert \mathbf{x}_{t-1}, \mathbf{x}_0) 
+= {q(\mathbf{x}_{t-1} \vert \mathbf{x}_{t}, \mathbf{x}_0)}
+\frac{ q(\mathbf{x}_{t} \vert \mathbf{x}_0)}{ q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) } \Big) \\
+
+&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \Big( \frac{
+  \textcolor{cyan}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}
+  }{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}}\cdot  \textcolor{cyan}{\frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1}\vert\mathbf{x}_0)}}
+ \Big) + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
+&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{
+  \textcolor{cyan}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}}{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}} + \underbrace{\textcolor{cyan}{\sum_{t=2}^T \log \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)} }}_{\text{telescoping sum 裂项相消}} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
+&= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \underbrace{\textcolor{cyan}{\log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{q(\mathbf{x}_1 \vert \mathbf{x}_0)}} + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{merge}} \Big]\\
+
 &= \mathbb{E}_q \Big[ \log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)} + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} - \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1) \Big] \\
 &= \mathbb{E}_q \Big[ \textcolor{green}{\underbrace{D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T))}_{L_T}} + \textcolor{cyan}{\sum_{t=2}^T \underbrace{D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t))}_{L_{t-1}}} - \textcolor{red}{\underbrace{\log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}_{L_0}} \Big] 
 \tag {15}
