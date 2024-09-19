@@ -2,7 +2,7 @@
 
 >  - See the original blog at https://lilianweng.github.io/posts/2021-07-11-diffusion-models/, written by Lilian Weng, on July 11, 2021.
 >  - See other blogs written by Lilian Weng about three types of generative models, including [GAN](https://lilianweng.github.io/posts/2017-08-20-gan/),  [VAE](https://lilianweng.github.io/posts/2018-08-12-vae/), and  [Flow-based](https://lilianweng.github.io/posts/2018-10-13-flow-models/)  models.
->  - a few annotation and study notes added by me on June 15, 2024.
+>  - A few annotation (especially for the equations) and study notes added by me on June 15, 2024.
 
 ---
 
@@ -88,12 +88,12 @@ Recall: **<font color='red'> Reparameterization Trick </font>** :
 
 - For example, a common choice of the form of $q_\phi(\mathbf{z}\vert\mathbf{x})$ is a multivariate Gaussian with a diagonal covariance structure:
 
-$$ 
+$$
 \begin{aligned} 
 \mathbf{z} & \sim q_\phi(\mathbf{z} \vert \mathbf{x}^{(i)}) = \mathcal{N}( \mathbf{z}; \boldsymbol{\mu}^{(i)}, \boldsymbol{\sigma}^{2(i)}\boldsymbol{I}) \\
 \mathbf{z} & = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon} \text{,  where } \boldsymbol{\epsilon} \sim \mathcal{N}(0, \boldsymbol{I}) \qquad \text{; Reparameterization trick.}
 \tag{2}
-\end{aligned} 
+\end{aligned}
 $$
 
  where $\odot$ refers to element-wise product.
