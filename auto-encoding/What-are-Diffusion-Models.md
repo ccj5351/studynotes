@@ -1,9 +1,8 @@
-# What are Diffusion Models?
+# What are Diffusion Models and Study Notes?
 
->  - See the original article at https://lilianweng.github.io/posts/2021-07-11-diffusion-models/, writen by Lilian Weng, on July 11, 2021
+>  - See the original blog at https://lilianweng.github.io/posts/2021-07-11-diffusion-models/, written by Lilian Weng, on July 11, 2021.
 >  - See other blogs written by Lilian Weng about three types of generative models, including [GAN](https://lilianweng.github.io/posts/2017-08-20-gan/),  [VAE](https://lilianweng.github.io/posts/2018-08-12-vae/), and  [Flow-based](https://lilianweng.github.io/posts/2018-10-13-flow-models/)  models.
->  - a few annotation and study notes added by Changjiang Cai on June 15, 2024.
-
+>  - a few annotation and study notes added by me on June 15, 2024.
 
 ---
 
