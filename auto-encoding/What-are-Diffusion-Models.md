@@ -45,7 +45,7 @@ This blog will discuss another type of generative model - `Diffusion models`.
 
 <div  align="center">
 <img  src="images/2021-07-11-diffusion-models/generative-overview.png"  alt="Overview of different types of generative models. "  width="700"  />
-<figcaption>
+<br><figcaption>
 Fig. 1. Overview of different types of generative models.
 </figcaption>
 </div>
@@ -71,7 +71,7 @@ The data sample $\mathbf{x}_0$ gradually loses its distinguishable features as t
 
 <div  align="center">
 <img  src="images/2021-07-11-diffusion-models/DDPM.png"  alt="Overview of different types of generative models. "  width="800"  />
-<figcaption>
+<br><figcaption>
 Fig. 2. The Markov chain of forward (reverse) diffusion process of generating a sample by slowly adding (removing) noise. <br> (Image source: <a href="https://arxiv.org/abs/2006.11239" target="_blank">Ho et al. 2020</a> with a few additional annotations).
 </figcaption>
 </div>
@@ -194,7 +194,7 @@ with two parameters estimated by model $p_\theta$ as
 
 <div  align="center">
 <img  src="images/2021-07-11-diffusion-models/diffusion-example.png"  alt="Overview of different types of generative models. "  width="900"  />
-<figcaption> Fig. 3. An example of training a diffusion model for modeling a 2D swiss roll data. (Image source: <a href="https://arxiv.org/abs/1503.03585" target="_blank">Sohl-Dickstein et al., 2015</a>)</figcaption>
+<br><figcaption> Fig. 3. An example of training a diffusion model for modeling a 2D swiss roll data. (Image source: <a href="https://arxiv.org/abs/1503.03585" target="_blank">Sohl-Dickstein et al., 2015</a>)</figcaption>
 </div>
 
 
@@ -451,8 +451,8 @@ $$
 where $C$ is a constant not depending on $\theta$.
 
 <div  align="center">
-<img src="images/2021-07-11-diffusion-models/DDPM-algo.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 4. The training and sampling algorithms in DDPM (Image source: <a href="https://arxiv.org/abs/2006.11239" target="_blank">Ho et al. 2020</a>)</figcaption>
+<img src="images/2021-07-11-diffusion-models/DDPM-algo.png" style="width: 100%;"/>
+<br><figcaption>Fig. 4. The training and sampling algorithms in DDPM (Image source: <a href="https://arxiv.org/abs/2006.11239" target="_blank">Ho et al. 2020</a>)</figcaption>
 </div>
 
 
@@ -518,7 +518,7 @@ However, the simple objective $L_\text{simple}$ does not depend on $\boldsymbol{
 
 <div  align="center">
 <img src="images/2021-07-11-diffusion-models/improved-DDPM-nll.png" style="width: 70%;" class="center" />
-<figcaption>Fig. 6. Comparison of negative log-likelihood of improved DDPM with other likelihood-based generative models. NLL is reported in the unit of bits/dim. (Image source: <a href="https://arxiv.org/abs/2102.09672" target="_blank">Nichol & Dhariwal, 2021</a>)</figcaption>
+<br><figcaption>Fig. 6. Comparison of negative log-likelihood of improved DDPM with other likelihood-based generative models. NLL is reported in the unit of bits/dim. (Image source: <a href="https://arxiv.org/abs/2102.09672" target="_blank">Nichol & Dhariwal, 2021</a>)</figcaption>
 </div>
 
 ## Conditioned Generation
@@ -559,7 +559,7 @@ The resulting <em>ablated diffusion model</em> (<strong>ADM</strong>) and the on
 
 <div  align="center">
 <img src="images/2021-07-11-diffusion-models/conditioned-DDPM.png" style="width: 90%;" class="center" />
-<figcaption>Fig. 7. The algorithms use guidance from a classifier to run conditioned generation with DDPM and DDIM. (Image source:  <a href="https://arxiv.org/abs/2105.05233" target="_blank">Dhariwal & Nichol, 2021</a>])</figcaption>
+<br><figcaption>Fig. 7. The algorithms use guidance from a classifier to run conditioned generation with DDPM and DDIM. (Image source:  <a href="https://arxiv.org/abs/2105.05233" target="_blank">Dhariwal & Nichol, 2021</a>])</figcaption>
 </div>
 
 
@@ -658,7 +658,7 @@ While all the models are trained with $T=1000$ diffusion steps in the experiment
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/DDIM-results.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 8. FID scores on CIFAR10 and CelebA datasets by diffusion models of different settings, including <font color="cyan"> DDIM </font> (η=0) and <font color="orange"> DDPM</font>. (Image source: <a href="https://arxiv.org/abs/2010.02502" target="_blank">Song et al., 2020</a>)</figcaption>
+<br><figcaption>Fig. 8. FID scores on CIFAR10 and CelebA datasets by diffusion models of different settings, including <font color="cyan"> DDIM </font> (η=0) and <font color="orange"> DDPM</font>. (Image source: <a href="https://arxiv.org/abs/2010.02502" target="_blank">Song et al., 2020</a>)</figcaption>
 </div>
 
 
@@ -671,7 +671,7 @@ Compared to DDPM, DDIM is able to:
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/progressive-distillation.png" style="width: 90%;" class="center" />
-<figcaption>Fig. 9. Progressive distillation can reduce the diffusion sampling steps by half in each iteration. (Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
+<br><figcaption>Fig. 9. Progressive distillation can reduce the diffusion sampling steps by half in each iteration. (Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
 </div>
 
 
@@ -679,14 +679,14 @@ Compared to DDPM, DDIM is able to:
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/progressive-distillation-algo.png" style="width: 90%;" class="center" />
-<figcaption>Fig. 10. Comparison of Algorithm 1 (diffusion model training) and Algorithm 2 (progressive distillation) side-by-side, where the relative changes in progressive distillation are highlighted in green.<br/>(Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
+<br><figcaption>Fig. 10. Comparison of Algorithm 1 (diffusion model training) and Algorithm 2 (progressive distillation) side-by-side, where the relative changes in progressive distillation are highlighted in green.<br/>(Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
 </div>
 
 <a id="consistency"></a><strong>Consistency Models</strong> (<a href="https://arxiv.org/abs/2303.01469">Song et al. 2023</a>) learns to map any intermediate noisy data points $\mathbf{x}_t, t > 0$ on the diffusion sampling trajectory back to its origin $\mathbf{x}_0$ directly. It is named as <em>consistency</em> model because of its <em>self-consistency</em> property as any data points on the same trajectory is mapped to the same origin.
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/consistency-models.png" style="width: 75%;" class="center" />
-<figcaption>Fig. 11. Consistency models learn to map any data point on the trajectory back to its origin. (Image source: <a href="https://arxiv.org/abs/2303.01469" target="_blank">Song et al., 2023</a>)</figcaption>
+<br><figcaption>Fig. 11. Consistency models learn to map any data point on the trajectory back to its origin. (Image source: <a href="https://arxiv.org/abs/2303.01469" target="_blank">Song et al., 2023</a>)</figcaption>
 </div>
 
 Given a trajectory $\{\mathbf{x}_t \vert t \in [\epsilon, T]\}$ , the <em>consistency function</em> $f$ is defined as $f: (\mathbf{x}_t, t) \mapsto \mathbf{x}_\epsilon$ and the equation $f(\mathbf{x}_t, t) = f(\mathbf{x}_{t'}, t') = \mathbf{x}_\epsilon$ holds true for all $t, t' \in [\epsilon, T]$. When $t=\epsilon$, $f$ is an identify function. The model can be parameterized as follows, where $c_\text{skip}(t)$ and $c_\text{out}(t)$ functions are designed in a way that $c_\text{skip}(\epsilon) = 1, c_\text{out}(\epsilon) = 0$:
@@ -746,7 +746,7 @@ According to the experiments in the paper, they found,
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/consistency-models-exp.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 12. Comparison of consistency models' performance under different configurations. The best configuration for CD is LPIPS distance metric, Heun ODE solver, and $N=18$.  (Image source: <a href="https://arxiv.org/abs/2303.01469" target="_blank">Song et al., 2023</a>)</figcaption>
+<br><figcaption>Fig. 12. Comparison of consistency models' performance under different configurations. The best configuration for CD is LPIPS distance metric, Heun ODE solver, and $N=18$.  (Image source: <a href="https://arxiv.org/abs/2303.01469" target="_blank">Song et al., 2023</a>)</figcaption>
 </div>
 
 
@@ -757,7 +757,7 @@ According to the experiments in the paper, they found,
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/image-distortion-rate.png" style="width: 50%;" class="center" />
-<figcaption>Fig. 13. The plot for a tradeoff between compression rate and distortion, illustrates two-stage compressions - perceptual and semantic compression. (Image source: <a href="https://arxiv.org/abs/2112.10752" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
+<br><figcaption>Fig. 13. The plot for a tradeoff between compression rate and distortion, illustrates two-stage compressions - perceptual and semantic compression. (Image source: <a href="https://arxiv.org/abs/2112.10752" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
 </div>
 
 --- 
@@ -786,7 +786,7 @@ $$
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/latent-diffusion-arch.png" style="width: 80%;" class="center" />
-<figcaption>Fig. 14. The architecture of the latent diffusion model (LDM). (Image source: <a href="https://arxiv.org/abs/2112.1075" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
+<br><figcaption>Fig. 14. The architecture of the latent diffusion model (LDM). (Image source: <a href="https://arxiv.org/abs/2112.1075" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
 </div>
 
 ## Scale up Generation Resolution and Quality <a id="scale-up-generation-resolution-and-quality"></a>
@@ -795,7 +795,7 @@ To generate high-quality images at high resolution, <a href="https://arxiv.org/a
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/cascaded-diffusion.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 15. A cascaded pipeline of multiple diffusion models at increasing resolutions. (Image source:  <a href="https://arxiv.org/abs/2106.15282" target="_blank">Ho et al. 2021</a>])</figcaption>
+<br><figcaption>Fig. 15. A cascaded pipeline of multiple diffusion models at increasing resolutions. (Image source:  <a href="https://arxiv.org/abs/2106.15282" target="_blank">Ho et al. 2021</a>])</figcaption>
 </div>
 
 They found the most effective noise is to apply Gaussian noise at low resolution and Gaussian blur at high resolution. In addition, they also explored two forms of conditioning augmentation that require small modification to the training process. Note that conditioning noise is only applied to training but not at inference.
@@ -819,7 +819,7 @@ $$
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/unCLIP.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 16. The architecture of unCLIP. (Image source:  <a href="https://arxiv.org/abs/2204.06125" target="_blank">Ramesh et al. 2022</a>])</figcaption>
+<br><figcaption>Fig. 16. The architecture of unCLIP. (Image source:  <a href="https://arxiv.org/abs/2204.06125" target="_blank">Ramesh et al. 2022</a>])</figcaption>
 </div>
 
 unCLIP follows a two-stage image generation process:
@@ -857,7 +857,7 @@ There are two common backbone architecture choices for diffusion models: U-Net a
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/U-net.png" style="width: 100%;" class="center" />
-<figcaption>Fig. 17. The U-net architecture. Each blue square is a feature map with the number of channels labeled on top and the height x width dimension labeled on the left bottom side. The gray arrows mark the shortcut connections. (Image source: <a href="https://arxiv.org/abs/1505.04597" target="_blank">Ronneberger, 2015</a>)</figcaption>
+<br><figcaption>Fig. 17. The U-net architecture. Each blue square is a feature map with the number of channels labeled on top and the height x width dimension labeled on the left bottom side. The gray arrows mark the shortcut connections. (Image source: <a href="https://arxiv.org/abs/1505.04597" target="_blank">Ronneberger, 2015</a>)</figcaption>
 </div>
 
 --- 
@@ -871,7 +871,7 @@ There are two common backbone architecture choices for diffusion models: U-Net a
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/ControlNet.png" style="width: 70%;" class="center" />
-<figcaption>Fig. 18. The ControlNet architecture. (Image source: <a href="https://arxiv.org/abs/2302.05543" target="_blank">Zhang et al. 2023</a>)</figcaption>
+<br><figcaption>Fig. 18. The ControlNet architecture. (Image source: <a href="https://arxiv.org/abs/2302.05543" target="_blank">Zhang et al. 2023</a>)</figcaption>
 </div>
 
 <strong>Diffusion Transformer</strong> (<strong>DiT</strong>; <a href="https://arxiv.org/abs/2212.09748">Peebles &amp; Xie, 2023</a>) for diffusion modeling operates on latent patches, using the same design space of <a href="#ldm">LDM</a> (Latent Diffusion Model)]. DiT has the following setup:
@@ -884,7 +884,7 @@ There are two common backbone architecture choices for diffusion models: U-Net a
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/DiT.png" style="width: 75%;" class="center" />
-<figcaption>Fig. 19. The Diffusion Transformer (DiT) architecture.<br/>(Image source: <a href="https://arxiv.org/abs/2212.09748" target="_blank">Peebles & Xie, 2023</a>)</figcaption>
+<br><figcaption>Fig. 19. The Diffusion Transformer (DiT) architecture.<br/>(Image source: <a href="https://arxiv.org/abs/2212.09748" target="_blank">Peebles & Xie, 2023</a>)</figcaption>
 </div>
 
 Transformer architecture can be easily scaled up and it is well known for that. This is one of the biggest benefits of DiT as its performance scales up with more compute and larger DiT models are more compute efficient according to the experiments.
