@@ -2,7 +2,7 @@
 
 >  - See the original blog at https://lilianweng.github.io/posts/2021-07-11-diffusion-models/, written by Lilian Weng, on July 11, 2021.
 >  - See other blogs written by Lilian Weng about three types of generative models, including [GAN](https://lilianweng.github.io/posts/2017-08-20-gan/),  [VAE](https://lilianweng.github.io/posts/2018-08-12-vae/), and  [Flow-based](https://lilianweng.github.io/posts/2018-10-13-flow-models/)  models.
->  - A few annotation (especially for the equations) and study notes added by me on June 15, 2024.
+>  - A few annotations (especially for the equations) and study notes were added by me on June 15, 2024.
 
 ---
 
@@ -44,7 +44,7 @@ This blog will discuss another type of generative model - `Diffusion models`.
 
 
 <div  align="center">
-<img  src="images/2021-07-11-diffusion-models/generative-overview.png"  alt="Overview of different types of generative models. "  width="900"  />
+<img  src="images/2021-07-11-diffusion-models/generative-overview.png"  alt="Overview of different types of generative models. "  width="700"  />
 <figcaption>
 Fig. 1. Overview of different types of generative models.
 </figcaption>
@@ -70,7 +70,7 @@ The data sample $\mathbf{x}_0$ gradually loses its distinguishable features as t
 
 
 <div  align="center">
-<img  src="images/2021-07-11-diffusion-models/DDPM.png"  alt="Overview of different types of generative models. "  width="900"  />
+<img  src="images/2021-07-11-diffusion-models/DDPM.png"  alt="Overview of different types of generative models. "  width="800"  />
 <figcaption>
 Fig. 2. The Markov chain of forward (reverse) diffusion process of generating a sample by slowly adding (removing) noise. <br> (Image source: <a href="https://arxiv.org/abs/2006.11239" target="_blank">Ho et al. 2020</a> with a few additional annotations).
 </figcaption>
@@ -92,11 +92,11 @@ $$
 \begin{aligned} 
 \mathbf{z} & \sim q_\phi(\mathbf{z} \vert \mathbf{x}^{(i)}) = \mathcal{N}( \mathbf{z}; \boldsymbol{\mu}^{(i)}, \boldsymbol{\sigma}^{2(i)}\boldsymbol{I}) \\
 \mathbf{z} & = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon} \text{,  where } \boldsymbol{\epsilon} \sim \mathcal{N}(0, \boldsymbol{I}) \qquad \text{; Reparameterization trick.}
-\tag{2}
 \end{aligned}
+\tag{2}
 $$
 
- where $\odot$ refers to element-wise product.
+ where $\odot$ refers to an element-wise product.
 
  ---
 
@@ -106,13 +106,9 @@ $$
 \begin{aligned}
 \mathbf{x}_t 
 &= \sqrt{\alpha_t}\mathbf{x}_{t-1} + \sqrt{1 - \alpha_t}\boldsymbol{\epsilon}_{t-1} \quad \text{ ;where } \boldsymbol{\epsilon}_{t-1}, \boldsymbol{\epsilon}_{t-2}, \dots \sim \mathcal{N}(\mathbf{0}, \mathbf{I}) \\
-
- ( &\Rightarrow  \text{ to subsitute: } \mathbf{x}_{t-1} = \sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \text{ , via } t \leftarrow t-1) \\
-
+( &\Rightarrow  \text{ to subsitute: } \mathbf{x}_{t-1} = \sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \text{ , via } t \leftarrow t-1) \\
 &= \sqrt{\alpha_t} \left(\sqrt{\alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_{t-1}}\boldsymbol{\epsilon}_{t-2} \right) + \sqrt{ 1 - \alpha_t} \boldsymbol{\epsilon}_{t-1} \\
-
 &= \sqrt{\alpha_t \alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{\alpha_t ( 1 - \alpha_{t-1} )}\boldsymbol{\epsilon}_{t-2}  + \sqrt{ 1 - \alpha_t} \boldsymbol{\epsilon}_{t-1} \\
-
 &= \sqrt{\alpha_t \alpha_{t-1}} \mathbf{x}_{t-2} + \sqrt{1 - \alpha_t \alpha_{t-1}} \bar{\boldsymbol{\epsilon}}_{t-2} \quad \text{ ;where } \bar{\boldsymbol{\epsilon}}_{t-2} \text{ merges two Gaussians (*).} \\
 &= \dots ( \text{ i.e., } t-1 \rightarrow t-2 \rightarrow \dots \rightarrow 3 \rightarrow 2 \rightarrow 1) \\
 &= \sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon} \\
@@ -163,10 +159,10 @@ $$
 \begin{aligned}
 q(\mathbf{x}_{t-1} \vert \mathbf{x}_t) 
 &=  \frac{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1})  q(\mathbf{x}_{t-1}) }{ q(\mathbf{x}_t ) } \\
-
 & \xRightarrow[\text{}]{\text{w.r.t hidden var. } z}   \frac{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1})  q(\mathbf{x}_{t-1}) }{ \int_{z} q\left( \mathbf {x_t}, z \right) dz } \\
 &=  \frac{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1})  q(\mathbf{x}_{t-1}) }{ \int_{z} q\left( \mathbf {x_t} \vert z \right) q\left( \mathbf {z} \right) dz } 
-\end{aligned} \tag{5}
+\end{aligned}
+\tag{5}
 $$
 
 - The integral part makes $q(\mathbf{x}_{t-1} \vert \mathbf{x}_t)$ `intractable`.
@@ -217,8 +213,8 @@ $$
 q(\mathbf{x}_t \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_t; \sqrt{\bar{\alpha}_t} \mathbf{x}_0, (1 - \bar{\alpha}_t)\mathbf{I}) \\
 &= \frac{1}{\sqrt{2\pi (1 - \bar{\alpha}_t)}} \exp{\left( -\frac{1}{2} \frac{\left( \mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0 \right)^2}{1 - \bar{\alpha}_t} \right)} \\
 & \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0\right)^2}{1 - \bar{\alpha}_t} \right)}
-\tag {8.1}
 \end{aligned}
+\tag {8.1}
 $$
 
 Then let $t \leftarrow (t-1)$, we have 
@@ -227,8 +223,8 @@ $$
 \begin{aligned}
 q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) &= \mathcal{N}(\mathbf{x}_{t-1}; \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0, (1 - \bar{\alpha}_{t-1})\mathbf{I}) \\
 & \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_{t-1} - \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0 \right)^2}{1 - \bar{\alpha}_{t-1}} \right)}
-\tag {8.2}
 \end{aligned}
+\tag {8.2}
 $$
 
 Also, Eq (1) with $\alpha_t = 1 - \beta_t$ gives 
@@ -236,11 +232,10 @@ $$
 \begin{aligned} 
 q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_{0}) & \xRightarrow[\text{}]{ \mathbf{x}_{t} \text { and } \mathbf{x}_{t-1} \text{ are indep. to } \mathbf{x}_{0}}
 q(\mathbf{x}_t \vert \mathbf{x}_{t-1}) \\
-
 &= \mathcal{N}(\mathbf{x}_t; \sqrt{\alpha_t} \mathbf{x}_{t-1}, \beta_t\mathbf{I}) \\
 & \propto \exp{\left( -\frac{1}{2} \frac{\left(\mathbf{x}_{t} - \sqrt{{\alpha}_{t}} \mathbf{x}_{t-1} \right)^2}{\beta_{t}} \right)}
-\tag{8.3}
 \end{aligned}
+\tag{8.3}
 $$
 
 Using Bayes' rule, we have:
@@ -250,17 +245,14 @@ $$
 q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) 
 &= \underbrace{ q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_0)}_{\text{Eq(8.3)}} 
 \frac{ \overbrace{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)}^{\text{Eq(8.2)}} }{ \underbrace{q(\mathbf{x}_t \vert \mathbf{x}_0)}_{\text{Eq(8.1)}}} \\
-
 &\propto \exp \Big(-\frac{1}{2} \big(\frac{(\mathbf{x}_t - \sqrt{\alpha_t} \mathbf{x}_{t-1})^2}{\beta_t} + \frac{(\mathbf{x}_{t-1} - \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0)^2}{1-\bar{\alpha}_{t-1}} - \frac{(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0)^2}{1-\bar{\alpha}_t} \big) \Big) \\
 &= \exp \Big(-\frac{1}{2} \big(\frac{\mathbf{x}_t^2 - 2\sqrt{\alpha_t} \mathbf{x}_t \color{blue}{\mathbf{x}_{t-1}} \color{green}{+ \alpha_t} \color{red}{\mathbf{x}_{t-1}^2} }{\beta_t} + \frac{ \color{red}{\mathbf{x}_{t-1}^2} \color{green}{- 2 \sqrt{\bar{\alpha}_{t-1}} \mathbf{x}_0} \color{blue}{\mathbf{x}_{t-1}} \color{green}{+ \bar{\alpha}_{t-1} \mathbf{x}_0^2}  }{1-\bar{\alpha}_{t-1}} - \frac{(\mathbf{x}_t - \sqrt{\bar{\alpha}_t} \mathbf{x}_0)^2}{1-\bar{\alpha}_t} \big) \Big) \\
 &= \exp\Big( -\frac{1}{2} \big( \color{red}{
   \underbrace{(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}})}_{1/{\tilde{\beta}_t }}
   } {\mathbf{x}_{t-1}^2} - \color{blue}{
-    \underbrace{(\frac{2\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{2\sqrt{\bar{\alpha}_{t-1}}}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)}_{2 \cdot A}
-    
-  } \mathbf{x}_{t-1} \color{green}{ + C(\mathbf{x}_t, \mathbf{x}_0) \big) \Big)}
-\tag {9}
+    \underbrace{(\frac{2\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{2\sqrt{\bar{\alpha}_{t-1}}}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)}_{2 \cdot A}} \mathbf{x}_{t-1} \color{green}{ + C(\mathbf{x}_t, \mathbf{x}_0) \big) \Big)}
 \end{aligned}
+\tag {9}
 $$
 
 
@@ -272,19 +264,15 @@ $$
 &= 1/(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}}) 
 = 1/(\frac{\alpha_t - \bar{\alpha}_t + \beta_t}{\beta_t(1 - \bar{\alpha}_{t-1})})
 = \color{green}{\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \cdot \beta_t} \\
-
 ( &\Rightarrow  \text{try to construct: } \left(\mathbf{x}_{t-1} - \mu_{x_{t-1}} \right)^2 \text{ to find the mean } \mu_{x_{t-1}} \text{ of the Gaussian}  \\
  &\Rightarrow  \text{so have to get : } 2 \cdot \mathbf{x}_{t-1} \cdot \mu_{x_{t-1}}  \text{ and so on. It is a math trick } \dots ) \\
-
 \tilde{\boldsymbol{\mu}}_t (\mathbf{x}_t, \mathbf{x}_0)
 &= {\underbrace{(\frac{\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1} }}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0)}_{A}} / \underbrace{(\frac{\alpha_t}{\beta_t} + \frac{1}{1 - \bar{\alpha}_{t-1}})}_{ 1/{\tilde{\beta}_t } } \\
-
 &\Rightarrow  \text{equals: }  A \cdot {\tilde{\beta}_t }  \text{, i.e., } \\
-
 &= (\frac{\sqrt{\alpha_t}}{\beta_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1} }}{1 - \bar{\alpha}_{t-1}} \mathbf{x}_0) \color{green}{\frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t} \cdot \beta_t} \\
 &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \mathbf{x}_0\\
-\tag {10}
 \end{aligned}
+\tag {10}
 $$
 
 Thanks to the nice property as shown in Eq 3, i.e.,
@@ -301,26 +289,15 @@ $$
 \tilde{\boldsymbol{\mu}}_t
 &= \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}}(\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t) \\
 &=  \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} \mathbf{x}_t + \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}}\mathbf{x}_t  -  \frac{\sqrt{\bar{\alpha}_{t-1}}\beta_t}{1 - \bar{\alpha}_t} \frac{1}{\sqrt{\bar{\alpha}_t}} \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t \\
-
 &=  \left( \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} + \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_{t}}} \frac{ \beta_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{\sqrt{\bar{\alpha}_{t-1}}}{\sqrt{\bar{\alpha}_{t}}} \frac{\beta_t}{1 - \bar{\alpha}_t} \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t \\
-
 (&\Rightarrow  \text{here we use: } \bar{\alpha}_t = \bar{\alpha}_{t-1} \cdot \alpha_t  \text{, and }   \beta_t = 1 - \alpha_t ) \\
-
 & =  \left( \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} + \frac{1}{\textcolor{cyan}{\sqrt{\alpha_{t}}}} \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\textcolor{cyan}{\sqrt{\alpha_{t}}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1})}{\sqrt{\alpha_t}(1 - \bar{\alpha}_t)} + \frac{1}{\sqrt{\alpha_{t}}} \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t (1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t} +  \frac{ 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t -  \alpha_t \bar{\alpha}_{t-1} + 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{\alpha_t - \bar{\alpha}_{t} + 1 - \alpha_t }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \frac{1}{\sqrt{\alpha_{t}}} \left( \frac{ 1- \bar{\alpha}_{t} }{1 - \bar{\alpha}_t} \right) \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
 & =  \frac{1}{\sqrt{\alpha_{t}}} \cdot 1  \cdot \mathbf{x}_t  -  \frac{1}{\sqrt{\alpha_{t}}} \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \\
-
-
 &= \textcolor{cyan}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)} \quad \quad \quad \quad \text{(12)}
 \end{aligned}
 $$
@@ -341,15 +318,14 @@ As demonstrated in Fig. 2., such a setup is very similar to <a href="https://lil
 
 $$
 \begin{aligned}
-- \log p_\theta(\mathbf{x}_0) 
-&\leq - \log p_\theta(\mathbf{x}_0) + D_\text{KL}(q(\mathbf{x}_{1:T}\vert\mathbf{x}_0) \| p_\theta(\mathbf{x}_{1:T}\vert\mathbf{x}_0) ) \\
+\text{-} \log  p_\theta(\mathbf{x}_0) &\leq - \log p_\theta(\mathbf{x}_0) + D_\text{KL}(q(\mathbf{x}_{1:T}\vert\mathbf{x}_0) \| p_\theta(\mathbf{x}_{1:T}\vert\mathbf{x}_0) ) \\
 &= -\log p_\theta(\mathbf{x}_0) + \mathbb{E}_{\mathbf{x}_{1:T}\sim q(\mathbf{x}_{1:T} \vert \mathbf{x}_0)} \Big[ \log\frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T}) / p_\theta(\mathbf{x}_0)} \Big] \\
 &= -\log p_\theta(\mathbf{x}_0) + \mathbb{E}_q \Big[ \log\frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} + \log p_\theta(\mathbf{x}_0) \Big] \\
 &= \mathbb{E}_q \Big[ \log \frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \\
 \text{Let }L_\text{VLB} 
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})} \Big[ \log \frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \geq - \mathbb{E}_{q(\mathbf{x}_0)} \log p_\theta(\mathbf{x}_0)
-\tag {13}
 \end{aligned}
+\tag {13}
 $$
 
 It is also straightforward to get the same result using `Jensen's inequality`. 
@@ -375,34 +351,28 @@ L_\text{CE}
 &\leq - \underbrace{\mathbb{E}_{q(\mathbf{x}_{0})}{\textcolor{cyan}{\mathbb{E}_{q(\mathbf{x}_{1:T}  \vert \mathbf{x}_{0})}}} }_{\text{merge to } \mathbf{x}_{0:T}} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
 &= - \mathbb{E}_{q(\mathbf{x}_{0:T})} \log \frac{p_\theta(\mathbf{x}_{0:T})}{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})} \\
 &= \mathbb{E}_{q(\mathbf{x}_{0:T})}\Big[\log \frac{q(\mathbf{x}_{1:T} \vert \mathbf{x}_{0})}{p_\theta(\mathbf{x}_{0:T})} \Big] = L_\text{VLB}
-\tag{14}
 \end{aligned}
+\tag{14}
 $$
 
 To convert each term in the equation to be `analytically computable`, the objective can be further rewritten to be a combination of several KL-divergence and entropy terms (See the detailed step-by-step process in Appendix B in [Sohl-Dickstein et al., 2015](https://arxiv.org/abs/1503.03585)):
 
 $$
 \begin{aligned}
-L_\text{VLB} 
-&= \mathbb{E}_{q(\mathbf{x}_{0:T})} \Big[ \log\frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \\
+L_\text{VLB} &= \mathbb{E}_{q(\mathbf{x}_{0:T})} \Big[ \log\frac{q(\mathbf{x}_{1:T}\vert\mathbf{x}_0)}{p_\theta(\mathbf{x}_{0:T})} \Big] \\
 (&\Rightarrow  \text{ to consider the forward diffusion process and reverse diffusion process })  \\ 
 &= \mathbb{E}_q \Big[ \log\frac{ \overbrace{\prod_{t=1}^T q(\mathbf{x}_t\vert\mathbf{x}_{t-1}) }^{\text{forward diffusion process, see Eq (1)}}}{ \underbrace{p_\theta(\mathbf{x}_T) \prod_{t=1}^T p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t) } _{\text{reverse diffusion process, see Eq 6}} } \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=1}^T \log \frac{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{\textcolor{cyan}{q(\mathbf{x}_t\vert\mathbf{x}_{t-1})}}{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}} +  \underbrace{\log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{t=1}} \Big] \\
-
 \Big(  & \text{see Eq 8.3, forward process }    q(\mathbf{x}_t \vert \mathbf{x}_{t-1})
     \xRightarrow[\text{}]{ \mathbf{x}_{t} \text { and } \mathbf{x}_{t-1} \text{ are indep. to } \mathbf{x}_{0}}  q(\mathbf{x}_t \vert \mathbf{x}_{t-1}, \mathbf{x}_{0})  \Big) \\
-
-
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{\textcolor{cyan}{q(\mathbf{x}_t\vert\mathbf{x}_{t-1},\mathbf{x}_0)}}  { 
   \textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}
 }
  +  \underbrace{\log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{t=1}} \Big] \\
-
 \Big( &\text{Baye's Theorem, forward process }  q(\mathbf{x}_{t} \vert \mathbf{x}_{t-1}, \mathbf{x}_0) 
 = {q(\mathbf{x}_{t-1} \vert \mathbf{x}_{t}, \mathbf{x}_0)}
 \frac{ q(\mathbf{x}_{t} \vert \mathbf{x}_0)}{ q(\mathbf{x}_{t-1} \vert \mathbf{x}_0) } \Big) \\
-
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \Big( \frac{
   \textcolor{cyan}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}
   }{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}}\cdot  \textcolor{cyan}{\frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1}\vert\mathbf{x}_0)}}
@@ -410,11 +380,10 @@ L_\text{VLB}
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{
   \textcolor{cyan}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}}{\textcolor{red}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)}} + \underbrace{\textcolor{cyan}{\sum_{t=2}^T \log \frac{q(\mathbf{x}_t \vert \mathbf{x}_0)}{q(\mathbf{x}_{t-1} \vert \mathbf{x}_0)} }}_{\text{telescoping sum 裂项相消}} + \log\frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)} \Big] \\
 &= \mathbb{E}_q \Big[ -\log p_\theta(\mathbf{x}_T) + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} + \underbrace{\textcolor{cyan}{\log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{q(\mathbf{x}_1 \vert \mathbf{x}_0)}} + \log \frac{q(\mathbf{x}_1 \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}}_{\text{merge}} \Big]\\
-
 &= \mathbb{E}_q \Big[ \log\frac{q(\mathbf{x}_T \vert \mathbf{x}_0)}{p_\theta(\mathbf{x}_T)} + \sum_{t=2}^T \log \frac{q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)}{p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t)} - \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1) \Big] \\
 &= \mathbb{E}_q \Big[ \textcolor{green}{\underbrace{D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T))}_{L_T}} + \textcolor{cyan}{\sum_{t=2}^T \underbrace{D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_{t-1} \vert\mathbf{x}_t))}_{L_{t-1}}} - \textcolor{red}{\underbrace{\log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)}_{L_0}} \Big] 
-\tag {15}
 \end{aligned}
+\tag {15}
 $$
 
 Let's label each component in the variational lower bound loss separately:
@@ -426,8 +395,8 @@ L_\text{VLB} &= L_T + L_{T-1} + \dots + L_0 \\
   \textcolor{green}{L_T} &= D_\text{KL}(q(\mathbf{x}_T \vert \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_T)) \\
   \textcolor{cyan}{L_t} &= D_\text{KL}(q(\mathbf{x}_t \vert \mathbf{x}_{t+1}, \mathbf{x}_0) \parallel p_\theta(\mathbf{x}_t \vert\mathbf{x}_{t+1})) \text{ for }1 \leq t \leq T-1 \\
   \textcolor{red}{L_0} &= - \log p_\theta(\mathbf{x}_0 \vert \mathbf{x}_1)
-\tag {16}
 \end{aligned}
+\tag {16}
 $$
 
 Every KL term in $L_\text{VLB}$ (except for $L_0$) compares two Gaussian distributions and therefore they can be computed in <a href="https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence#Multivariate_normal_distributions">closed form</a>. $L_T$ is constant and can be ignored during training because $q$ has no learnable parameters and $\mathbf{x}_T$ is a Gaussian noise. <a href="https://arxiv.org/abs/2006.11239">Ho et al. 2020</a> models $L_0$ using a separate discrete decoder derived from $\mathcal{N}(\mathbf{x}_0; \boldsymbol{\mu}_\theta(\mathbf{x}_1, 1), \boldsymbol{\Sigma}_\theta(\mathbf{x}_1, 1))$.
@@ -441,8 +410,8 @@ $$
 \begin{aligned}
 \boldsymbol{\mu}_\theta(\mathbf{x}_t, t) &= \color{cyan}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \Big)} \\
 \text{Thus }\mathbf{x}_{t-1} & \sim \mathcal{N}(\mathbf{x}_{t-1}; \frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \Big), \boldsymbol{\Sigma}_\theta(\mathbf{x}_t, t))
-\tag {17}
 \end{aligned}
+\tag {17}
 $$
 
 
@@ -455,8 +424,8 @@ L_{t-1} &= D_\text{KL}(q(\mathbf{x}_{t-1} \vert \mathbf{x}_{t}, \mathbf{x}_0) \p
 &= \mathbb{E}_{\mathbf{x}_0, \boldsymbol{\epsilon}} \Big[\frac{1}{2  \|\boldsymbol{\Sigma}_\theta \|^2_2} \| \color{blue}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_t \Big)} - \color{green}{\frac{1}{\sqrt{\alpha_t}} \Big( \mathbf{x}_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\boldsymbol{\epsilon}}_\theta(\mathbf{x}_t, t) \Big)} \|^2 \Big] \\
 &= \mathbb{E}_{\mathbf{x}_0, \boldsymbol{\epsilon}} \Big[\frac{ (1 - \alpha_t)^2 }{2 \alpha_t (1 - \bar{\alpha}_t) \| \boldsymbol{\Sigma}_\theta \|^2_2} \|\boldsymbol{\epsilon}_t - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\|^2 \Big] \\
 &= \mathbb{E}_{\mathbf{x}_0, \boldsymbol{\epsilon}} \Big[\frac{ (1 - \alpha_t)^2 }{2 \alpha_t (1 - \bar{\alpha}_t) \| \boldsymbol{\Sigma}_\theta \|^2_2} \|\boldsymbol{\epsilon}_t - \boldsymbol{\epsilon}_\theta(\sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t, t)\|^2 \Big] 
-\tag {18}
 \end{aligned}
+\tag {18}
 $$
 
 #### Simplification
@@ -468,8 +437,8 @@ $$
 L_t^\text{simple}
 &= \mathbb{E}_{t \sim [1, T], \mathbf{x}_0, \boldsymbol{\epsilon}_t} \Big[\|\boldsymbol{\epsilon}_t - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\|^2 \Big] \\
 &= \mathbb{E}_{t \sim [1, T], \mathbf{x}_0, \boldsymbol{\epsilon}_t} \Big[\|\boldsymbol{\epsilon}_t - \boldsymbol{\epsilon}_\theta(\sqrt{\bar{\alpha}_t}\mathbf{x}_0 + \sqrt{1 - \bar{\alpha}_t}\boldsymbol{\epsilon}_t, t)\|^2 \Big]
-\tag {19}
 \end{aligned}
+\tag {19}
 $$
 
 The final simple objective is:
@@ -568,8 +537,8 @@ $$
 &= \nabla_{\mathbf{x}_t} \log q(\mathbf{x}_t) + \nabla_{\mathbf{x}_t} \log q(y \vert \mathbf{x}_t) \\
 &\approx - \frac{1}{\sqrt{1 - \bar{\alpha}_t}} \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) + \nabla_{\mathbf{x}_t} \log f_\phi(y \vert \mathbf{x}_t) \\
 &= - \frac{1}{\sqrt{1 - \bar{\alpha}_t}} (\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) - \sqrt{1 - \bar{\alpha}_t} \nabla_{\mathbf{x}_t} \log f_\phi(y \vert \mathbf{x}_t))
-\tag{24}
 \end{aligned}
+\tag{24}
 $$
 
 Thus, a new classifier-guided predictor $\bar{\boldsymbol{\epsilon}}_\theta$ would take the form as following,
@@ -588,7 +557,7 @@ $$
 The resulting <em>ablated diffusion model</em> (<strong>ADM</strong>) and the one with additional classifier guidance (<strong>ADM-G</strong>) are able to achieve better results than SOTA generative models (e.g. BigGAN).
 
 <div  align="center">
-<img src="images/2021-07-11-diffusion-models/conditioned-DDPM.png" style="width: 100%;" class="center" />
+<img src="images/2021-07-11-diffusion-models/conditioned-DDPM.png" style="width: 90%;" class="center" />
 <figcaption>Fig. 7. The algorithms use guidance from a classifier to run conditioned generation with DDPM and DDIM. (Image source:  <a href="https://arxiv.org/abs/2105.05233" target="_blank">Dhariwal & Nichol, 2021</a>])</figcaption>
 </div>
 
@@ -610,8 +579,8 @@ $$
 &= \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, y) - \sqrt{1 - \bar{\alpha}_t} \; w \nabla_{\mathbf{x}_t} \log p(y \vert \mathbf{x}_t) \\
 &= \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, y) + w \big(\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, y) - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t) \big) \\
 &= (w+1) \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, y) - w \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)
-\tag{26}
 \end{aligned}
+\tag{26}
 $$
 
 Their experiments showed that classifier-free guidance can achieve a good balance between FID (distinguish between synthetic and generated images) and IS (quality and diversity).
@@ -660,8 +629,8 @@ $$
 &= \sqrt{\bar{\alpha}_{t-1}} \Big( \frac{\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t} \epsilon^{(t)}_\theta(\mathbf{x}_t)}{\sqrt{\bar{\alpha}_t}} \Big) + \sqrt{1 - \bar{\alpha}_{t-1} - \sigma_t^2} \epsilon^{(t)}_\theta(\mathbf{x}_t) + \sigma_t\boldsymbol{\epsilon} \\
 q_\sigma(\mathbf{x}_{t-1} \vert \mathbf{x}_t, \mathbf{x}_0)
 &= \mathcal{N}(\mathbf{x}_{t-1}; \sqrt{\bar{\alpha}_{t-1}} \Big( \frac{\mathbf{x}_t - \sqrt{1 - \bar{\alpha}_t} \epsilon^{(t)}_\theta(\mathbf{x}_t)}{\sqrt{\bar{\alpha}_t}} \Big) + \sqrt{1 - \bar{\alpha}_{t-1} - \sigma_t^2} \epsilon^{(t)}_\theta(\mathbf{x}_t), \sigma_t^2 \mathbf{I})
-\tag{27}
 \end{aligned}
+\tag{27}
 $$
 
 where the model $\epsilon^{(t)}_\theta(.)$ predicts the $\epsilon_t$ from $\mathbf{x}_t$.
@@ -676,7 +645,7 @@ $$
 
 Let $\sigma_t^2 = \eta \cdot \tilde{\beta}_t$ such that we can adjust $\eta \in \mathbb{R}^+$ as a hyperparameter to control the sampling stochasticity. The special case of $\eta = 0$ makes the sampling process <em>deterministic</em>. Such a model is named the <em>denoising diffusion implicit model</em> (<strong>DDIM</strong>; <a href="https://arxiv.org/abs/2010.02502">Song et al., 2020</a>). DDIM has the same marginal noise distribution but deterministically maps noise back to the original data samples.
 
-During generation, we don&rsquo;t have to follow the whole chain $t=1,\dots,T$, but rather a subset of steps. Let&rsquo;s denote $s &lt; t$ as two steps in this accelerated trajectory. The DDIM update step is:
+During generation, we don&rsquo;t have to follow the whole chain $t=1,\dots,T$, but rather a subset of steps. Let's denote $s < t$ as two steps in this accelerated trajectory. The DDIM update step is:
 
 $$
 q_{\sigma, s < t}(\mathbf{x}_s \vert \mathbf{x}_t, \mathbf{x}_0)
@@ -700,7 +669,7 @@ Compared to DDPM, DDIM is able to:
 </ol>
 
 <div align="center">
-<img src="images/2021-07-11-diffusion-models/progressive-distillation.png" style="width: 100%;" class="center" />
+<img src="images/2021-07-11-diffusion-models/progressive-distillation.png" style="width: 90%;" class="center" />
 <figcaption>Fig. 9. Progressive distillation can reduce the diffusion sampling steps by half in each iteration. (Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
 </div>
 
@@ -708,18 +677,18 @@ Compared to DDPM, DDIM is able to:
 <a id="prog-distll"></a><strong>Progressive Distillation</strong> (<a href="https://arxiv.org/abs/2202.00512">Salimans &amp; Ho, 2022</a>) is a method for distilling trained deterministic samplers into new models of halved sampling steps. The student model is initialized from the teacher model and denoises towards a target where one student DDIM step matches 2 teacher steps, instead of using the original sample $\mathbf{x}_0$ as the denoise target. In every progressive distillation iteration, we can half the sampling steps.
 
 <div align="center">
-<img src="images/2021-07-11-diffusion-models/progressive-distillation-algo.png" style="width: 100%;" class="center" />
+<img src="images/2021-07-11-diffusion-models/progressive-distillation-algo.png" style="width: 90%;" class="center" />
 <figcaption>Fig. 10. Comparison of Algorithm 1 (diffusion model training) and Algorithm 2 (progressive distillation) side-by-side, where the relative changes in progressive distillation are highlighted in green.<br/>(Image source: <a href="https://arxiv.org/abs/2202.00512" target="_blank">Salimans & Ho, 2022</a>)</figcaption>
 </div>
 
-<a id="consistency"></a><strong>Consistency Models</strong> (<a href="https://arxiv.org/abs/2303.01469">Song et al. 2023</a>) learns to map any intermediate noisy data points $\mathbf{x}_t, t &gt; 0$ on the diffusion sampling trajectory back to its origin $\mathbf{x}_0$ directly. It is named as <em>consistency</em> model because of its <em>self-consistency</em> property as any data points on the same trajectory is mapped to the same origin.
+<a id="consistency"></a><strong>Consistency Models</strong> (<a href="https://arxiv.org/abs/2303.01469">Song et al. 2023</a>) learns to map any intermediate noisy data points $\mathbf{x}_t, t > 0$ on the diffusion sampling trajectory back to its origin $\mathbf{x}_0$ directly. It is named as <em>consistency</em> model because of its <em>self-consistency</em> property as any data points on the same trajectory is mapped to the same origin.
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/consistency-models.png" style="width: 75%;" class="center" />
 <figcaption>Fig. 11. Consistency models learn to map any data point on the trajectory back to its origin. (Image source: <a href="https://arxiv.org/abs/2303.01469" target="_blank">Song et al., 2023</a>)</figcaption>
 </div>
 
-Given a trajectory $\{\mathbf{x}_t \vert t \in [\epsilon, T]\}$ , the <em>consistency function</em> $f$ is defined as $f: (\mathbf{x}_t, t) \mapsto \mathbf{x}_\epsilon$ and the equation $f(\mathbf{x}_t, t) = f(\mathbf{x}_{t&rsquo;}, t&rsquo;) = \mathbf{x}_\epsilon$ holds true for all $t, t&rsquo; \in [\epsilon, T]$. When $t=\epsilon$, $f$ is an identify function. The model can be parameterized as follows, where $c_\text{skip}(t)$ and $c_\text{out}(t)$ functions are designed in a way that $c_\text{skip}(\epsilon) = 1, c_\text{out}(\epsilon) = 0$:
+Given a trajectory $\{\mathbf{x}_t \vert t \in [\epsilon, T]\}$ , the <em>consistency function</em> $f$ is defined as $f: (\mathbf{x}_t, t) \mapsto \mathbf{x}_\epsilon$ and the equation $f(\mathbf{x}_t, t) = f(\mathbf{x}_{t'}, t') = \mathbf{x}_\epsilon$ holds true for all $t, t' \in [\epsilon, T]$. When $t=\epsilon$, $f$ is an identify function. The model can be parameterized as follows, where $c_\text{skip}(t)$ and $c_\text{out}(t)$ functions are designed in a way that $c_\text{skip}(\epsilon) = 1, c_\text{out}(\epsilon) = 0$:
 
 $$
 f_\theta(\mathbf{x}, t) = c_\text{skip}(t)\mathbf{x} + c_\text{out}(t) F_\theta(\mathbf{x}, t)
@@ -737,13 +706,13 @@ The paper introduced two ways to train consistency models:
 
 
 $$
- \begin{aligned}
- \mathcal{L}^N_\text{CD} (\theta, \theta^-; \phi) &= \mathbb{E}
+\begin{aligned}
+\mathcal{L}^N_\text{CD} (\theta, \theta^-; \phi) &= \mathbb{E}
  [\lambda(t_n)d(f_\theta(\mathbf{x}_{t_{n+1}}, t_{n+1}), f_{\theta^-}(\hat{\mathbf{x}}^\phi_{t_n}, t_n)] \\
- \hat{\mathbf{x}}^\phi_{t_n} &= \mathbf{x}_{t_{n+1}} - (t_n - t_{n+1}) \Phi(\mathbf{x}_{t_{n+1}}, t_{n+1}; \phi)
- \tag{31}
- \end{aligned}
- $$
+\hat{\mathbf{x}}^\phi_{t_n} &= \mathbf{x}_{t_{n+1}} - (t_n - t_{n+1}) \Phi(\mathbf{x}_{t_{n+1}}, t_{n+1}; \phi)
+\end{aligned}
+\tag{31}
+$$
 
 where
 
@@ -783,11 +752,11 @@ According to the experiments in the paper, they found,
 ### Latent Variable Space
 <a id="latent-variable-space"></a>
 
-<a id="ldm"></a><em>Latent diffusion model</em> (<strong>LDM</strong>; <a href="https://arxiv.org/abs/2112.10752">Rombach &amp; Blattmann, et al. 2022</a>) runs the diffusion process in the latent space instead of pixel space, making training cost lower and inference speed faster. It is motivated by the observation that most bits of an image contribute to perceptual details and the semantic and conceptual composition still remains after aggressive compression. LDM loosely decomposes the perceptual compression and semantic compression with generative modeling learning by first trimming off pixel-level redundancy with autoencoder and then manipulating / generating semantic concepts with diffusion process on learned latent.
+<a id="ldm"></a><em>Latent diffusion model</em> (<strong>LDM</strong>; <a href="https://arxiv.org/abs/2112.10752">Rombach &amp; Blattmann, et al. 2022</a>) runs the diffusion process in the latent space instead of pixel space, making training cost lower and inference speed faster. It is motivated by the observation that most bits of an image contribute to perceptual details and the semantic and conceptual composition still remains after aggressive compression. LDM loosely decomposes the perceptual compression and semantic compression with generative modeling learning by first trimming off pixel-level redundancy with autoencoder and then manipulating / generating semantic concepts with a diffusion process on learned latent.
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/image-distortion-rate.png" style="width: 50%;" class="center" />
-<figcaption>Fig. 13. The plot for tradeoff between compression rate and distortion, illustrating two-stage compressions - perceptual and semantic compression. (Image source: <a href="https://arxiv.org/abs/2112.10752" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
+<figcaption>Fig. 13. The plot for a tradeoff between compression rate and distortion, illustrates two-stage compressions - perceptual and semantic compression. (Image source: <a href="https://arxiv.org/abs/2112.10752" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
 </div>
 
 --- 
@@ -797,7 +766,7 @@ The perceptual compression process relies on an autoencoder model. An encoder $\
 - **KL-reg**: A small KL penalty towards a standard normal distribution over the learned latent, similar to <a href="https://lilianweng.github.io/posts/2018-08-12-vae/">VAE</a>.
 - **VQ-reg**: Uses a vector quantization layer within the decoder, like <a href="https://lilianweng.github.io/posts/2018-08-12-vae/#vq-vae-and-vq-vae-2">VQVAE</a> but the quantization layer is absorbed by the decoder.
 
-The diffusion and denoising processes happen on the latent vector $\mathbf{z}$. The denoising model is a time-conditioned U-Net, augmented with the cross-attention mechanism to handle flexible conditioning information for image generation (e.g. class labels, semantic maps, blurred variants of an image). The design is equivalent to fuse representation of different modality into the model with a cross-attention mechanism. Each type of conditioning information is paired with a domain-specific encoder $\tau_\theta$ to project the conditioning input $y$ to an intermediate representation that can be mapped into cross-attention component, $\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}$:
+The diffusion and denoising processes happen on the latent vector $\mathbf{z}$. The denoising model is a time-conditioned U-Net, augmented with the cross-attention mechanism to handle flexible conditioning information for image generation (e.g. class labels, semantic maps, blurred variants of an image). The design is equivalent to fuse the representation of different modalities into the model with a cross-attention mechanism. Each type of conditioning information is paired with a domain-specific encoder $\tau_\theta$ to project the conditioning input $y$ to an intermediate representation that can be mapped into cross-attention component, $\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}$:
 
 $$
 \begin{aligned}
@@ -810,12 +779,12 @@ $$
 \mathbf{W}^{(i)}_K, \mathbf{W}^{(i)}_V \in \mathbb{R}^{d \times d_\tau},\;
 \varphi_i(\mathbf{z}_i) \in \mathbb{R}^{N \times d^i_\epsilon},\;
 \tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}
-\tag{33}
 \end{aligned}
+\tag{33}
 $$
 
 <div align="center">
-<img src="latent-diffusion-arch.png" style="width: 80%;" class="center" />
+<img src="images/2021-07-11-diffusion-models/latent-diffusion-arch.png" style="width: 80%;" class="center" />
 <figcaption>Fig. 14. The architecture of the latent diffusion model (LDM). (Image source: <a href="https://arxiv.org/abs/2112.1075" target="_blank">Rombach & Blattmann, et al. 2022</a>)</figcaption>
 </div>
 
@@ -830,7 +799,7 @@ To generate high-quality images at high resolution, <a href="https://arxiv.org/a
 
 They found the most effective noise is to apply Gaussian noise at low resolution and Gaussian blur at high resolution. In addition, they also explored two forms of conditioning augmentation that require small modification to the training process. Note that conditioning noise is only applied to training but not at inference.
 
-- Truncated conditioning augmentation stops the diffusion process early at step $t &gt; 0$ for low resolution.
+- Truncated conditioning augmentation stops the diffusion process early at step $t > 0$ for low resolution.
 
 - Non-truncated conditioning augmentation runs the full low resolution reverse process until step 0 but then corrupt it by $\mathbf{z}_t \sim q(\mathbf{x}_t \vert \mathbf{x}_0)$ and then feeds the corrupted $\mathbf{z}_t$ s into the super-resolution model.
 
