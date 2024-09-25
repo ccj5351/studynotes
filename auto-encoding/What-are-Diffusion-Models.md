@@ -773,22 +773,27 @@ The perceptual compression process relies on an autoencoder model. An encoder $\
 - **KL-reg**: A small KL penalty towards a standard normal distribution over the learned latent, similar to <a href="https://lilianweng.github.io/posts/2018-08-12-vae/">VAE</a>.
 - **VQ-reg**: Uses a vector quantization layer within the decoder, like <a href="https://lilianweng.github.io/posts/2018-08-12-vae/#vq-vae-and-vq-vae-2">VQVAE</a> but the quantization layer is absorbed by the decoder.
 
-The diffusion and denoising processes happen on the latent vector $\mathbf{z}$. The denoising model is a time-conditioned U-Net, augmented with the cross-attention mechanism to handle flexible conditioning information for image generation (e.g. class labels, semantic maps, blurred variants of an image). The design is equivalent to fuse the representation of different modalities into the model with a cross-attention mechanism. Each type of conditioning information is paired with a domain-specific encoder $\tau_\theta$ to project the conditioning input $y$ to an intermediate representation that can be mapped into cross-attention component, $\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}$:
+The diffusion and denoising processes happen on the latent vector $\mathbf{z}$. The denoising model is a `time-conditioned U-Net`, augmented with the cross-attention mechanism to handle flexible conditioning information for image generation (e.g. class labels, semantic maps, blurred variants of an image). The design is equivalent to fuse the representation of different modalities into the model with a cross-attention mechanism. Each type of conditioning information is paired with a domain-specific encoder $\tau_\theta$ to project the conditioning input $y$ to an intermediate representation that can be mapped into cross-attention component, $\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}$:
 
 $$
 \begin{aligned}
 &\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\Big(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d}}\Big) \cdot \mathbf{V} \\
-&\text{where }\mathbf{Q} = \mathbf{W}^{(i)}_Q \cdot \varphi_i(\mathbf{z}_i),\;
+&\text{where }\mathbf{Q} = \mathbf{W}^{(i)}_Q \cdot \varphi_i(\mathbf{z}_t),\;
 \mathbf{K} = \mathbf{W}^{(i)}_K \cdot \tau_\theta(y),\;
 \mathbf{V} = \mathbf{W}^{(i)}_V \cdot \tau_\theta(y) \\
 &\text{and }
 \mathbf{W}^{(i)}_Q \in \mathbb{R}^{d \times d^i_\epsilon},\;
 \mathbf{W}^{(i)}_K, \mathbf{W}^{(i)}_V \in \mathbb{R}^{d \times d_\tau},\;
-\varphi_i(\mathbf{z}_i) \in \mathbb{R}^{N \times d^i_\epsilon},\;
+\varphi_i(\mathbf{z}_t) \in \mathbb{R}^{N \times d^i_\epsilon},\;
 \tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}
 \end{aligned}
 \tag{33}
 $$
+
+with 
+- $t$ uniformly sampled from $\{1, \dots, T \}$, and 
+- $\varphi_i(\mathbf{z}_t) \in \mathbb{R}^{N \times d^i_\epsilon}$ denotes a (flattened) intermediate representation of the UNet implementing $\boldsymbol{\epsilon}_\theta$ and 
+- learnable weights $\mathbf{W}^{(i)}_Q \in \mathbb{R}^{d \times d^i_\epsilon}$ for query $Q$ (`note`: $Q$ is from latent variable $\mathbf{z}_t$, weights $\mathbf{W}^{(i)}_K \in \mathbb{R}^{d \times d_\tau}$ for key $K$ and weights $\mathbf{W}^{(i)}_V \in \mathbb{R}^{d \times d_\tau}$ for value $V$ (`note`: $K$ and $V$ are from the conditioning input $y$).
 
 <div align="center">
 <img src="images/2021-07-11-diffusion-models/latent-diffusion-arch.png" style="width: 80%;" class="center" />
